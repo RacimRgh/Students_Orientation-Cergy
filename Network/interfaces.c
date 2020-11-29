@@ -9,12 +9,13 @@ User welcome()
     User etu;
     while (1)
     {
-        printf("\n\t\t*********************************\n");
-        printf("\t\t\tBienvenue sur la borne d'aide d'étudiants\n");
-        printf("\n\n\t\t\t**********Appuyez sur une touche pour commencer...\n\n");
-        printf("\t\t*********************************\n");
+        printf("\n\t\t*********************************************************");
+        printf("\n\t\t****\t\t\t\t\t\t     ****");
+        printf("\n\t\t**** \t Bienvenue sur la borne d'aide d'étudiants   ****");
+        printf("\n\t\t**** \t Appuyez sur une touche pour commencer...    ****");
+        printf("\n\t\t*********************************************************\n");
         sleep(2);
-        system("clear");
+        //system("clear");
         etu = enter_information();
         break;
     }

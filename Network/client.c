@@ -9,7 +9,6 @@ void func(int sockfd)
 {
     char buff[MAX];
     int n;
-    connectDB();
     for (;;)
     {
         bzero(buff, sizeof(buff));

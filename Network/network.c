@@ -13,6 +13,7 @@ void func(int sockfd)
     char buff[MAX];
     int n;
     // infinite loop for chat
+    connectDB();
     for (;;)
     {
         bzero(buff, MAX);
