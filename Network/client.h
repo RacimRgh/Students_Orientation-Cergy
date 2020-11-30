@@ -1,7 +1,7 @@
 #ifndef __cl
 #define __cl
 #include "interfaces.h"
-#define MAX 80
+#define MAX 1000
 #define PORT 8080
 #define SA struct sockaddr
 

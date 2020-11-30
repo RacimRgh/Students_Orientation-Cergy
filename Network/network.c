@@ -5,27 +5,47 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 #include "network.h"
 #include "interfaces.h"
 
 // Function designed for chat between client and server.
 void server_func(int sockfd, PGconn *conn)
 {
-    char buff[MAX];
+    char buff[MAX], borne[MAX];
+    bzero(borne, sizeof(borne));
+    bzero(buff, sizeof(buff));
     int n;
     User etu;
+
+    // Récupération du code de la borne
+    read(sockfd, borne, sizeof(borne));
+    bzero(buff, sizeof(buff));
+
+    // Récupération des informations de l'utilisateur
     read(sockfd, buff, sizeof(buff));
-    strcpy(etu.matricule, buff);
-    read(sockfd, buff, sizeof(buff));
-    strcpy(etu.nom, buff);
-    read(sockfd, buff, sizeof(buff));
-    strcpy(etu.prenom, buff);
-    read(sockfd, buff, sizeof(buff));
-    strcpy(etu.email, buff);
-    read(sockfd, buff, sizeof(buff));
-    strcpy(etu.tel, buff);
+    sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
     affiche(etu);
-    insert_user(conn, etu);
+
+    // Lecture de la foire aux questions
+    QR *qr = recup_faq(conn, borne);
+    if (sizeof(qr) != 0)
+    {
+        printf("\n HERE: %ld", sizeof(qr));
+        for (int i = 0; i < sizeof(qr); i++)
+        {
+            // Vérifier la validité de l'information
+            if (strcmp((qr + i)->id, ""))
+            {
+                sprintf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                write(sockfd, buff, sizeof(buff));
+                bzero(buff, sizeof(buff));
+            }
+        }
+        write(sockfd, "end", sizeof("end"));
+    }
+    //insert_user(conn, etu);
     // printf("\nHERE");
     // infinite loop for chat
     // for (int i = 0; i < 5; i++)
