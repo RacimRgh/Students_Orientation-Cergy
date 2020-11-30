@@ -6,38 +6,52 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include "network.h"
+#include "interfaces.h"
 
 // Function designed for chat between client and server.
-void func(int sockfd)
+void server_func(int sockfd, PGconn *conn)
 {
     char buff[MAX];
     int n;
+    User etu;
+    read(sockfd, buff, sizeof(buff));
+    strcpy(etu.matricule, buff);
+    read(sockfd, buff, sizeof(buff));
+    strcpy(etu.nom, buff);
+    read(sockfd, buff, sizeof(buff));
+    strcpy(etu.prenom, buff);
+    read(sockfd, buff, sizeof(buff));
+    strcpy(etu.email, buff);
+    read(sockfd, buff, sizeof(buff));
+    strcpy(etu.tel, buff);
+    affiche(etu);
+    insert_user(conn, etu);
+    // printf("\nHERE");
     // infinite loop for chat
-    connectDB();
-    for (;;)
-    {
-        bzero(buff, MAX);
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     bzero(buff, MAX);
 
-        // read the message from client and copy it in buffer
-        read(sockfd, buff, sizeof(buff));
-        // print buffer which contains the client contents
-        printf("From client: %s\t To client : ", buff);
-        bzero(buff, MAX);
-        n = 0;
-        // copy server message in the buffer
-        while ((buff[n++] = getchar()) != '\n')
-            ;
+    //     // read the message from client and copy it in buffer
+    //     read(sockfd, buff, sizeof(buff));
+    //     // print buffer which contains the client contents
+    //     printf("From client: %s");
+    //     bzero(buff, MAX);
+    //     // n = 0;
+    //     // // copy server message in the buffer
+    //     // while ((buff[n++] = getchar()) != '\n')
+    //     //     ;
 
-        // and send that buffer to client
-        write(sockfd, buff, sizeof(buff));
+    //     // // and send that buffer to client
+    //     // write(sockfd, buff, sizeof(buff));
 
-        // if msg contains "Exit" then server exit and chat ended.
-        if (strncmp("exit", buff, 4) == 0)
-        {
-            printf("Server Exit...\n");
-            break;
-        }
-    }
+    //     // // if msg contains "Exit" then server exit and chat ended.
+    //     // if (strncmp("exit", buff, 4) == 0)
+    //     // {
+    //     //     printf("Server Exit...\n");
+    //     //     break;
+    //     // }
+    // }
 }
 
 // Driver function
@@ -81,6 +95,9 @@ int main()
         printf("Server listening..\n");
     len = sizeof(cli);
 
+    // Connect to database
+    PGconn *conn = connectDB();
+
     // Accept the data packet from client and verification
     connfd = accept(sockfd, (SA *)&cli, &len);
     if (connfd < 0)
@@ -92,7 +109,7 @@ int main()
         printf("server acccept the client...\n");
 
     // Function for chatting between client and server
-    func(connfd);
+    server_func(connfd, conn);
 
     // After chatting close the socket
     close(sockfd);

@@ -1,3 +1,5 @@
+#ifndef __USERS
+#define __USERS
 typedef struct users
 {
     char matricule[50];
@@ -7,5 +9,8 @@ typedef struct users
     char tel[50];
 } User;
 
-User welcome();
+void welcome();
 User enter_information();
+void affiche(User etu);
+
+#endif

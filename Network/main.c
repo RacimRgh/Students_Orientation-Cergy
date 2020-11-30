@@ -4,7 +4,7 @@
 
 void main()
 {
-    User etu;
-    etu = welcome();
-    connect_to_server(etu);
+    //User etu;
+    welcome();
+    //connect_to_server();
 }

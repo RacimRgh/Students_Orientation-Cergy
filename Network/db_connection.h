@@ -1,4 +1,10 @@
+#ifndef __db
+#define __db
 #include <libpq-fe.h>
+#include "interfaces.h"
 
 void do_exit(PGconn *conn);
-void connectDB();
+PGconn *connectDB();
+void insert_user(PGconn *conn, User etu);
+
+#endif

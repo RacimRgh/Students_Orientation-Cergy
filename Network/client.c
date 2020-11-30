@@ -3,20 +3,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <signal.h>
 #include "client.h"
 
-void func(int sockfd)
+char c = 'n';
+void user_stop_handler(int sig)
 {
-    char buff[MAX];
-    int n;
-    for (;;)
+    if (sig == 2)
     {
-        bzero(buff, sizeof(buff));
-        printf("Enter the string : ");
-        n = 0;
-        while ((buff[n++] = getchar()) != '\n')
-            ;
-        write(sockfd, buff, sizeof(buff));
+        printf("Etes-vous sur de vouloir arreter ? (o/n) \n");
+        scanf("%c", &c);
+        exit(0);
+    }
+}
+
+void client_func(int sockfd)
+{
+    signal(SIGINT, user_stop_handler);
+    char buff[MAX];
+    User etu;
+    etu = enter_information();
+    affiche(etu);
+    int n;
+    do
+    {
+        // bzero(buff, sizeof(buff));
+        // printf("Enter the string : ");
+        // n = 0;
+        // while ((buff[n++] = getchar()) != '\n')
+        //     ;
+        write(sockfd, etu.matricule, sizeof(buff));
+        write(sockfd, etu.nom, sizeof(buff));
+        write(sockfd, etu.prenom, sizeof(buff));
+        write(sockfd, etu.email, sizeof(buff));
+        write(sockfd, etu.tel, sizeof(buff));
         bzero(buff, sizeof(buff));
         read(sockfd, buff, sizeof(buff));
         printf("From Server : %s", buff);
@@ -25,10 +45,10 @@ void func(int sockfd)
             printf("Client Exit...\n");
             break;
         }
-    }
+    } while (c == 'n');
 }
 
-void connect_to_server(User etu)
+void connect_to_server()
 {
     int sockfd, connfd;
     struct sockaddr_in servaddr, cli;
@@ -44,7 +64,7 @@ void connect_to_server(User etu)
         printf("Socket successfully created..\n");
     bzero(&servaddr, sizeof(servaddr));
 
-    printf("\n***************** Welcome %s %s !", etu.nom, etu.prenom);
+    // printf("\n***************** Welcome %s %s !", etu.nom, etu.prenom);
 
     // assign IP, PORT
     servaddr.sin_family = AF_INET;
@@ -61,7 +81,7 @@ void connect_to_server(User etu)
         printf("connected to the server..\n");
 
     // function for chat
-    func(sockfd);
+    client_func(sockfd);
 
     // close the socket
     close(sockfd);
