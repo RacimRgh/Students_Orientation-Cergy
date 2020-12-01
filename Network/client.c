@@ -15,6 +15,7 @@ void user_stop_handler(int sig)
     {
         printf("\n/!\\ Etes-vous sur de vouloir arreter ? (o/n) \n");
         scanf("%c", &c);
+        exit(0);
     }
 }
 
@@ -25,6 +26,8 @@ void client_func(int sockfd)
     int i = 0;
     User etu;
     QR qr[MAX];
+    char **types;
+    types = malloc(3 * sizeof(char *));
     etu = enter_information();
     bzero(buff, sizeof(buff));
     // affiche(etu);
@@ -41,6 +44,23 @@ void client_func(int sockfd)
 
     // Vider le buffer
     bzero(buff, sizeof(buff));
+
+    // Récupération des types de questions de la FAQ
+    i = 0;
+    for (;;)
+    {
+        read(sockfd, buff, MAX);
+        if (strncmp("end", buff, 3) == 0)
+            break;
+        types[i] = malloc(50 * sizeof(char));
+        strcpy(types[i], buff);
+        i++;
+        bzero(buff, sizeof(buff));
+    }
+    // Envoi au serveur du type demandé pour récupérer les questions réponses correspondantes
+    char *choix = typesFAQ(types, 3);
+    printf("\n\t***%s", choix);
+    write(sockfd, choix, MAX);
 
     // Récupération de la foire à question de la part du serveur
     for (;;)

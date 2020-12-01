@@ -52,7 +52,7 @@ void insert_user(PGconn *conn, User etu)
     PQfinish(conn);
 }
 
-QR *recup_faq(PGconn *conn, char *borne)
+char **recup_typesFAQ(PGconn *conn, char *borne, int *n)
 {
     // Paramètres de la fonction PGexecparams
     // Pour faire une requete préparée
@@ -64,7 +64,43 @@ QR *recup_faq(PGconn *conn, char *borne)
     int resultFormat = 0;
 
     // Requete de récupération de la FAQ de la borne concernée
-    char cmd[] = "SELECT * FROM FAQ WHERE idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$1);";
+    char cmd[] = "SELECT DISTINCT typeFAQ FROM FAQ WHERE idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$1);";
+    // Execution de la requete préparée
+    PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
+        printf("No data retrieved\n");
+        PQclear(res);
+        PQfinish(conn);
+        return NULL;
+        // do_exit(conn);
+    }
+    int rows = PQntuples(res);
+    *n = rows;
+    char **types;
+    types = malloc(rows * sizeof(char *));
+    for (int i = 0; i < rows; i++)
+    {
+        types[i] = malloc(50 * sizeof(char));
+        strcpy(types[i], PQgetvalue(res, i, 0));
+        //printf("\n\n\t***** %s", types[i]);
+    }
+    return types;
+}
+
+QR *recup_faq(PGconn *conn, char *borne, char *type)
+{
+    // Paramètres de la fonction PGexecparams
+    // Pour faire une requete préparée
+    // Code de la borne
+    const char *const paramValues[] = {type, borne};
+    const int paramLengths[] = {sizeof(type), sizeof(borne)};
+    const int paramFormats[] = {0, 0};
+    int nParams = 2;
+    int resultFormat = 0;
+
+    // Requete de récupération de la FAQ de la borne concernée
+    char cmd[] = "SELECT * FROM FAQ WHERE typeFAQ=$1 AND idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$2);";
     // Execution de la requete préparée
     PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
 

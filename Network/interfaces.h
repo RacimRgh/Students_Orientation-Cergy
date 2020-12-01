@@ -23,6 +23,7 @@ typedef struct questions
 void welcome();
 User enter_information();
 void affiche(User etu);
+char *typesFAQ(char **types, int n);
 void questions(QR *qr);
 
 #endif

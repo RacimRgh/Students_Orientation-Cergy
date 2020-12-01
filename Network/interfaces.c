@@ -48,6 +48,37 @@ void affiche(User etu)
     printf("\n**** %s ** %s ** %s ** %s ** %s\n", etu.nom, etu.prenom, etu.matricule, etu.tel, etu.email);
 }
 
+char *typesFAQ(char **types, int n)
+{
+    int choix = 0;
+    // system("clear");
+    printf("\n\t\t*********************************************************");
+    printf("\n\t\t****\t\t\t\t\t\t     ****");
+    printf("\n\t\t****\tCode - Type");
+    printf("\n\t\t****\t\t\t\t\t\t     ****");
+    printf("\n\t\t*********************************************************");
+    for (int i = 1; i <= n; i++)
+    {
+        printf("\n\t\t****\t%d - %s\n", i, types[i - 1]);
+    }
+    printf("\n\t\t****\t0 - Question personnalisée.");
+    printf("\n\t\t****\t\t\t\t\t\t     ****");
+    printf("\n\t\t*********************************************************\n");
+    printf("\n******** Votre choix ?\t(1-x) : ");
+    scanf("%d", &choix);
+    switch (choix)
+    {
+    case 1:
+    {
+        return types[0];
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
 void questions(QR *qr)
 {
     // system("clear");

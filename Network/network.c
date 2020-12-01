@@ -28,11 +28,25 @@ void server_func(int sockfd, PGconn *conn)
     sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
     affiche(etu);
 
+    // Récupération des types de requetes, pour donner un choix à l'utilisateur
+    char **types;
+    types = recup_typesFAQ(conn, borne, &n);
+    for (int i = 0; i < n; i++)
+    {
+        write(sockfd, types[i], MAX);
+        bzero(buff, sizeof(buff));
+        // printf("\n**** %s", types[i]);
+    }
+    write(sockfd, "end", MAX);
+    bzero(buff, sizeof(buff));
+
     // Lecture de la foire aux questions
-    QR *qr = recup_faq(conn, borne);
+    read(sockfd, buff, sizeof(buff));
+    // printf("\n\t___%s", buff);
+    QR *qr = recup_faq(conn, borne, buff);
     if (sizeof(qr) != 0)
     {
-        printf("\n HERE: %ld", sizeof(qr));
+        // printf("\n HERE: %ld", sizeof(qr));
         for (int i = 0; i < sizeof(qr); i++)
         {
             // Vérifier la validité de l'information
@@ -45,6 +59,7 @@ void server_func(int sockfd, PGconn *conn)
         }
         write(sockfd, "end", sizeof("end"));
     }
+
     //insert_user(conn, etu);
     // printf("\nHERE");
     // infinite loop for chat
@@ -132,5 +147,5 @@ int main()
     server_func(connfd, conn);
 
     // After chatting close the socket
-    close(sockfd);
+    //close(sockfd);
 }
