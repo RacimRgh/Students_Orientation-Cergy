@@ -28,6 +28,8 @@ int client_func(int sockfd)
     QR qr[MAX];
     char **types;
     types = malloc(3 * sizeof(char *));
+
+    // Demander les informations de l'utilisateur
     etu = enter_information();
     bzero(buff, sizeof(buff));
     // affiche(etu);
@@ -35,6 +37,8 @@ int client_func(int sockfd)
     // Envoi du code de la borne pour authentification au serveur
     // Et pour récupération des données la concernant
     write(sockfd, "B1", sizeof("B1"));
+    bzero(buff, sizeof(buff));
+    write(sockfd, "A1", sizeof("A1"));
     bzero(buff, sizeof(buff));
 
     // Envoi les informations de l'utilisateur au serveur pour envoyer à la BD
@@ -91,14 +95,19 @@ int client_func(int sockfd)
                 read(sockfd, buff, sizeof(buff));
                 if (strncmp("end", buff, 3) == 0)
                     break;
-                sscanf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                sscanf(buff, "%s;;;%s;;;%s;;;%s;;;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
                 i++;
             }
             questions(qr);
         }
         else
         {
-            formuler_question();
+            QR qrp;
+            qrp = formuler_question();
+            bzero(buff, sizeof(buff));
+            sprintf(buff, "%s %s %s %s", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+            printf("\n_______%s\n", buff);
+            write(sockfd, buff, sizeof(buff));
         }
     }
     else

@@ -44,26 +44,23 @@ CREATE TABLE Etudiant
 	CONSTRAINT Etudiant_pk PRIMARY KEY (matricule_etu)
 );
 
---	id_dem VARCHAR(50),
---	CONSTRAINT Demandeur_pk PRIMARY KEY (id_dem)
---	CONSTRAINT Demandeur_fk FOREIGN KEY (id_dem) REFERENCES Etudiant (matricule_etu),
-CREATE TABLE Demandeur 
+CREATE TABLE Demandeur
 (
-	matricule_etu VARCHAR(50),
+	id_dem VARCHAR(50),
 	type_dem VARCHAR(50),
 	etat_dem VARCHAR(50),
-	CONSTRAINT Demandeur_pk PRIMARY KEY (matricule_etu)
+	CONSTRAINT Demandeur_pk PRIMARY KEY (id_dem)
+	--CONSTRAINT Demandeur_fk FOREIGN KEY (matricule_etu) REFERENCES Etudiant (matricule_etu)
 ) INHERITS (Etudiant); 
 
---	CONSTRAINT Assistant_fk FOREIGN KEY (id_ast) REFERENCES Etudiant (matricule_etu),
---	CONSTRAINT Assistant_pk PRIMARY KEY (id_ast)
 CREATE TABLE Assistant
 (
-	matricule_etu VARCHAR(50),
+	id_ast VARCHAR(50),
 	statut_ast VARCHAR(10),
 	date_inscription DATE,
 	nb_reponses INT,
-	CONSTRAINT Assistant_pk PRIMARY KEY (matricule_etu)
+	CONSTRAINT Assistant_pk PRIMARY KEY (id_ast)
+	--CONSTRAINT Assistant_fk FOREIGN KEY (matricule_etu) REFERENCES Etudiant (matricule_etu)
 ) INHERITS (Etudiant);
 
 CREATE TABLE Message
@@ -78,27 +75,19 @@ CREATE TABLE Message
 
 CREATE TABLE Question
 (
-	idQ VARCHAR(50),
 	titreQ VARCHAR(50),
 	contenuQ VARCHAR(50),
 	id_borne VARCHAR(50),
-	matriculeDem VARCHAR(50),
-	CONSTRAINT Question_pk PRIMARY KEY (idQ),
-	CONSTRAINT Question_fk1 FOREIGN KEY (idQ) REFERENCES Message (idMessage),
-	CONSTRAINT Question_fk2 FOREIGN KEY (id_borne) REFERENCES Borne (id_borne),
-	CONSTRAINT Question_fk3 FOREIGN KEY (matriculeDem) REFERENCES Demandeur (matricule_etu)
+	idDem VARCHAR(50),
+	CONSTRAINT Question_fk1 FOREIGN KEY (id_borne) REFERENCES Borne (id_borne),
+	CONSTRAINT Question_fk2 FOREIGN KEY (idDem) REFERENCES Demandeur (id_dem)
 ) INHERITS (Message);
 
 CREATE TABLE Reponse
 (
-	idR VARCHAR(50),
 	contenuRep VARCHAR(50),
-	matriculeRep VARCHAR(50),
-	idQ VARCHAR(50),
-	CONSTRAINT Reponse_pk PRIMARY KEY (idR),
-	CONSTRAINT Reponse_fk1 FOREIGN KEY (idR) REFERENCES Message (idMessage),
-	CONSTRAINT Reponse_fk2 FOREIGN KEY (matriculeRep) REFERENCES Assistant (matricule_etu),
-	CONSTRAINT Reponse_fk3 FOREIGN KEY (idQ) REFERENCES Question (idQ)
+	idAst VARCHAR(50),
+	CONSTRAINT Reponse_fk1 FOREIGN KEY (idAst) REFERENCES Assistant (id_ast)
 ) INHERITS (Message);
 
 CREATE TABLE Connexion

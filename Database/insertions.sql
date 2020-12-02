@@ -5,11 +5,18 @@ INSERT INTO Borne (id_borne, longitude, latitude, etatB) VALUES ('B3', 48.84703,
 INSERT INTO Administrateur (idAdm, roleAdm, nomAdm, prenomAdm, telAdm) VALUES ('A1', 'Moderateur', 'Richard', 'STALLMAN', '+3368453687');
 INSERT INTO Administrateur (idAdm, roleAdm, nomAdm, prenomAdm, telAdm) VALUES ('A2', 'Moderateur', 'John', 'DOE', '+337036984532');
 
-INSERT INTO Assistant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, statut_ast, date_inscription) VALUES ('2843', 'Mapaga', 'Marlyse', 'marlyse@gmail.com', '+3365123647', 'CY Cergy Paris', 'Informatique', 'Hors ligne', '2020-10-30');
+--INSERT INTO Etudiant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu) VALUES ('2843', 'Mapaga', 'Marlyse', 'marlyse@gmail.com', '+3365123647', 'CY Cergy Paris', 'Informatique');
 
-INSERT INTO Assistant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, statut_ast, date_inscription) VALUES ('6531', 'Trabelsi','Lydia', 'lydia@gmail.com', '+336465132', 'CY Cergy Paris', 'Informatique', 'Hors ligne', '2020-10-30');
 
-INSERT INTO Demandeur (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu) VALUES ('2211', 'Righi', 'Racim', 'racim@gmail.com', '+3368931247', 'CY Cergy Paris', 'Informatique');
+--INSERT INTO Etudiant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu) VALUES ('6531', 'Trabelsi','Lydia', 'lydia@gmail.com', '+336465132', 'CY Cergy Paris', 'Informatique');
+
+--INSERT INTO Etudiant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu) VALUES ('2211', 'Righi', 'Racim', 'racim@gmail.com', '+3368931247', 'CY Cergy Paris', 'Informatique');
+
+INSERT INTO Assistant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, id_ast, statut_ast, date_inscription) VALUES ('2843', 'Mapaga', 'Marlyse', 'marlyse@gmail.com', '+3365123647', 'CY Cergy Paris', 'Informatique', 'A2843', 'Hors ligne', '2020-10-30');
+
+INSERT INTO Assistant (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, id_ast, statut_ast, date_inscription) VALUES ('6531', 'Trabelsi','Lydia', 'lydia@gmail.com', '+336465132', 'CY Cergy Paris', 'Informatique', 'A6531', 'Hors ligne', '2020-10-30');
+
+INSERT INTO Demandeur (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, id_dem) VALUES ('2211', 'Righi', 'Racim', 'racim@gmail.com', '+3368931247', 'CY Cergy Paris', 'Informatique', 'D2211');
 
 INSERT INTO Connexion (matricule_etu, id_borne, date_connexion, heure_connexion) VALUES ('2211', 'B1', '2020-11-29', '11:26');
 
@@ -25,8 +32,9 @@ INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '3');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '4');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '5');
 
-INSERT INTO Message(idMessage, admAjout) VALUES ('Q1', 'A1');
-INSERT INTO Question (idMessage, dateMess, heureMess, idQ, titreQ, contenuQ, id_borne, matriculeDem) VALUES ('Q1', '2020-12-01', '12:34', 'Q1', 'Test question', 'long description', 'B1', '2211');
+INSERT INTO Question (idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ('Q1', '2020-12-01', '12:34', 'A1', 'Test question', 'long description', 'B1', 'D2211');
+
+INSERT INTO Reponse (idMessage, dateMess, heureMess, admAjout, contenuRep, idAst) VALUES ('R2', '2020-12-02', '14:18', 'A1', 'This is the way','A6531');
 
 
 

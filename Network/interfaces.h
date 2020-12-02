@@ -2,6 +2,7 @@
 #define __USERS
 typedef struct users
 {
+    char id[50];
     char matricule[50];
     char nom[50];
     char prenom[50];
@@ -20,6 +21,8 @@ typedef struct questions
     char titre[50];
     char contenu[200];
     char reponse[200];
+    char date[50];
+    char heure[50];
 } QR;
 
 void welcome();

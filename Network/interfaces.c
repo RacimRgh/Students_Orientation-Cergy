@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 #include "client.h"
 
 void welcome()
@@ -104,9 +105,10 @@ void questions(QR *qr)
 
 QR formuler_question()
 {
-    int n = 0;
-    char buff[MAX];
     QR qr;
+    char buff[MAX];
+    int n = 0;
+
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t****Ici vous pouvez formuler votre propre question, et l'envoyer au site web pour qu'elle soit traité par un étudiant assistant");
@@ -115,4 +117,12 @@ QR formuler_question()
     scanf("%s", qr.titre);
     printf("\n\t\t****\tVeuillez donner plus de détails: ");
     scanf("%s", qr.contenu);
+
+    // Récupération de la date et heure actuelle
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    sprintf(qr.date, "%d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    sprintf(qr.heure, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+    return qr;
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "db_connection.h"
 
 void do_exit(PGconn *conn)
@@ -22,28 +23,42 @@ PGconn *connectDB()
     char *user = PQuser(conn);
     char *db_name = PQdb(conn);
     char *pswd = PQpass(conn);
-    printf("\n______________\n Connecté à la base de données !\n");
+    printf("\n______________\nConnecté à la base de données !\n");
     printf("User: %s\n", user);
     printf("Database name: %s\n__________________\n", db_name);
     return conn;
 }
 
-int insert_user(PGconn *conn, User etu)
+User insert_user(PGconn *conn, User etu)
 {
-    const char *const paramValues[] = {etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel};
-    const int paramLengths[] = {sizeof(etu.matricule), sizeof(etu.nom), sizeof(etu.prenom), sizeof(etu.email), sizeof(etu.tel)};
-    const int paramFormats[] = {0, 0, 0, 0, 0};
-    int nParams = 5;
+    // Génération d'un ID unique de la demande
+    // En utilisant: matricule étudiant + date de demande
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    sprintf(etu.id, "%sD%02d%02d", etu.matricule, tm.tm_hour, tm.tm_min);
+
+    // Paramètres de la requete
+    const char *const paramValues[] = {etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel, etu.universite, etu.specialite, etu.id};
+    // Taille des paramètres
+    const int paramLengths[] = {sizeof(etu.matricule), sizeof(etu.nom), sizeof(etu.prenom), sizeof(etu.email), sizeof(etu.tel), sizeof(etu.universite), sizeof(etu.specialite), sizeof(etu.id)};
+    // Format des paramètres (char*)
+    const int paramFormats[] = {0, 0, 0, 0, 0, 0, 0, 0};
+    // Nombre de paramètres
+    int nParams = 8;
+    // Format du résulat (char*)
     int resultFormat = 0;
-    char cmd[] = "INSERT INTO Demandeur VALUES ($1, $2, $3, $4, $5)";
+    // Requete SQL
+    char cmd[] = "INSERT INTO Demandeur (matricule_etu, nom_etu, prenom_etu, email_etu, numtel_etu, univ_etu, specialite_etu, id_dem) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
     PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
     // printf("\n\nHEREDB\n\n");
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
         printf("\n****Echec de l'ajout !\n");
+        strcpy(etu.id, "err");
         //do_exit(conn);
     }
     PQclear(res);
+    return etu;
     //PQfinish(conn);
 }
 
@@ -146,6 +161,32 @@ int update_user(PGconn *conn, User etu)
         return 0;
         // do_exit(conn);
     }
+    PQclear(res);
+    return 1;
+}
+
+int add_question(PGconn *conn, QR qr, User etu, char *borne, char *adm)
+{
+    sprintf(qr.id, "Q%s", etu.id);
+    printf("\nQuestion: \n*** %s-%s-%s-%s-%s-%s-%s-%s\n", qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id);
+    const char *const paramValues[] = {qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id};
+    const int paramLengths[] = {sizeof(qr.id), sizeof(qr.date), sizeof(qr.heure), sizeof(adm), sizeof(qr.titre), sizeof(qr.contenu), sizeof(borne), sizeof(etu.id)};
+    const int paramFormats[] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int nParams = 8;
+    int resultFormat = 0;
+    char cmd[] = "INSERT INTO Question (idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);";
+
+    // Execution de la requete préparée
+    PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        printf("UPDATE command failed\n");
+        PQclear(res);
+        return 0;
+        // do_exit(conn);
+    }
+
     PQclear(res);
     return 1;
 }

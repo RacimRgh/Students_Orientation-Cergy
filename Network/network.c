@@ -13,7 +13,7 @@
 // Function designed for chat between client and server.
 int server_func(int sockfd, PGconn *conn)
 {
-    char buff[MAX], borne[MAX], choix[MAX];
+    char buff[MAX], borne[MAX], choix[MAX], adm[MAX];
     bzero(borne, sizeof(borne));
     bzero(buff, sizeof(buff));
     int n, req, tentative;
@@ -21,7 +21,8 @@ int server_func(int sockfd, PGconn *conn)
 
     // Récupération du code de la borne
     read(sockfd, borne, sizeof(borne));
-    bzero(buff, sizeof(buff));
+    read(sockfd, adm, sizeof(adm));
+    printf("\n****Connexion de la borne '%s' géré par l'admin '%s'\n", borne, adm);
 
     // Récupération des informations de l'utilisateur
     read(sockfd, buff, sizeof(buff));
@@ -29,8 +30,8 @@ int server_func(int sockfd, PGconn *conn)
     tentative = 1;
 retry:
     affiche(etu);
-    req = insert_user(conn, etu);
-    if (req == 0 && tentative < 4)
+    etu = insert_user(conn, etu);
+    if (strncmp(etu.id, "err", 3) == 0 && tentative < 4)
     {
         sprintf(buff, "(%d/3)", tentative);
         write(sockfd, buff, MAX);
@@ -83,7 +84,7 @@ retry:
                 // Vérifier la validité de l'information
                 if (strcmp((qr + i)->id, ""))
                 {
-                    sprintf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                    sprintf(buff, "%s;;;%s;;;%s;;;%s;;;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
                     write(sockfd, buff, sizeof(buff));
                     bzero(buff, sizeof(buff));
                 }
@@ -94,7 +95,13 @@ retry:
     else
     {
         printf("\n****Attente de la formulation de la question");
-        sleep(30);
+        bzero(buff, sizeof(buff));
+        read(sockfd, buff, sizeof(buff));
+        QR qrp;
+        sscanf(buff, "%s %s %s %s", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        printf("\n\n Message reçu: \n %s-%s-%s-%s\n\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        req = add_question(conn, qrp, etu, borne, adm);
+        printf("\n****** %d ***\n", req);
     }
 
     printf("\n*** Attente du choix\n");
