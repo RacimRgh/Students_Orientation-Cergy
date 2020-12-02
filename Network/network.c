@@ -11,12 +11,12 @@
 #include "interfaces.h"
 
 // Function designed for chat between client and server.
-void server_func(int sockfd, PGconn *conn)
+int server_func(int sockfd, PGconn *conn)
 {
-    char buff[MAX], borne[MAX];
+    char buff[MAX], borne[MAX], choix[MAX];
     bzero(borne, sizeof(borne));
     bzero(buff, sizeof(buff));
-    int n;
+    int n, req, tentative;
     User etu;
 
     // Récupération du code de la borne
@@ -26,8 +26,26 @@ void server_func(int sockfd, PGconn *conn)
     // Récupération des informations de l'utilisateur
     read(sockfd, buff, sizeof(buff));
     sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
+    tentative = 1;
+retry:
     affiche(etu);
-
+    req = insert_user(conn, etu);
+    if (req == 0 && tentative < 4)
+    {
+        sprintf(buff, "(%d/3)", tentative);
+        write(sockfd, buff, MAX);
+        printf("\n****Echec de la connexion. Tentative (%d/3)", tentative);
+        sleep(2);
+        tentative++;
+        goto retry;
+    }
+    if (tentative == 4)
+    {
+        printf("\n****Problème de connexion, veuillez réessayer plus tard.");
+        write(sockfd, "FAIL", MAX);
+        return -1;
+    }
+    write(sockfd, "OK", MAX);
     // Récupération des types de requetes, pour donner un choix à l'utilisateur
     char **types;
     types = recup_typesFAQ(conn, borne, &n);
@@ -38,28 +56,50 @@ void server_func(int sockfd, PGconn *conn)
         // printf("\n**** %s", types[i]);
     }
     write(sockfd, "end", MAX);
-    bzero(buff, sizeof(buff));
 
-    // Lecture de la foire aux questions
+    // Lecture du choix foire aux questions
+    bzero(buff, sizeof(buff));
     read(sockfd, buff, sizeof(buff));
-    // printf("\n\t___%s", buff);
-    QR *qr = recup_faq(conn, borne, buff);
-    if (sizeof(qr) != 0)
+    strcpy(choix, buff);
+    printf("\n\t___%s", choix);
+
+    // Mettre à jour l'utilisateur avec le type de demande formulé
+    strcpy(etu.type_dem, buff);
+    strcpy(etu.etat_dem, "En attente");
+    req = update_user(conn, etu);
+    if (req)
     {
-        // printf("\n HERE: %ld", sizeof(qr));
-        for (int i = 0; i < sizeof(qr); i++)
+        printf("\n**Mise à jour faite!");
+        write(sockfd, "OK", MAX);
+    }
+    if (strncmp(buff, "Personnalisée", 13))
+    {
+        printf("\nRécupération de la FAQ des %s", buff);
+        QR *qr = recup_faq(conn, borne, buff);
+        if (sizeof(qr) != 0)
         {
-            // Vérifier la validité de l'information
-            if (strcmp((qr + i)->id, ""))
+            for (int i = 0; i < sizeof(qr); i++)
             {
-                sprintf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
-                write(sockfd, buff, sizeof(buff));
-                bzero(buff, sizeof(buff));
+                // Vérifier la validité de l'information
+                if (strcmp((qr + i)->id, ""))
+                {
+                    sprintf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                    write(sockfd, buff, sizeof(buff));
+                    bzero(buff, sizeof(buff));
+                }
             }
+            write(sockfd, "end", sizeof("end"));
         }
-        write(sockfd, "end", sizeof("end"));
+    }
+    else
+    {
+        printf("\n****Attente de la formulation de la question");
+        sleep(30);
     }
 
+    printf("\n*** Attente du choix\n");
+    bzero(buff, sizeof(buff));
+    read(sockfd, buff, sizeof(buff));
     //insert_user(conn, etu);
     // printf("\nHERE");
     // infinite loop for chat
@@ -94,6 +134,9 @@ int main()
 {
     int sockfd, connfd, len;
     struct sockaddr_in servaddr, cli;
+    int s;
+    int optval;
+    socklen_t optlen = sizeof(optval);
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -104,9 +147,38 @@ int main()
     }
     else
         printf("Socket successfully created..\n");
-    bzero(&servaddr, sizeof(servaddr));
+
+    /* Check the status for the keepalive option */
+    if (getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0)
+    {
+        perror("getsockopt()");
+        close(s);
+        exit(EXIT_FAILURE);
+    }
+    printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
+
+    /* Set the option active */
+    optval = 1;
+    optlen = sizeof(optval);
+    if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0)
+    {
+        perror("setsockopt()");
+        close(s);
+        exit(EXIT_FAILURE);
+    }
+    printf("SO_KEEPALIVE set on socket\n");
+
+    /* Check the status again */
+    if (getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0)
+    {
+        perror("getsockopt()");
+        close(s);
+        exit(EXIT_FAILURE);
+    }
+    printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
 
     // assign IP, PORT
+    bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
@@ -121,13 +193,14 @@ int main()
         printf("Socket successfully binded..\n");
 
     // Now server is ready to listen and verification
+wait_client:
     if ((listen(sockfd, 5)) != 0)
     {
         printf("Listen failed...\n");
         exit(0);
     }
     else
-        printf("Server listening..\n");
+        printf("\n_____________________________\nServer listening..\n");
     len = sizeof(cli);
 
     // Connect to database
@@ -145,7 +218,7 @@ int main()
 
     // Function for chatting between client and server
     server_func(connfd, conn);
-
+    goto wait_client;
     // After chatting close the socket
     //close(sockfd);
 }

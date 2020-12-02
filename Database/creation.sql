@@ -71,8 +71,9 @@ CREATE TABLE Message
 	idMessage VARCHAR(50),
 	dateMess DATE,
 	heureMess time,
+	admAjout VARCHAR(50),
 	CONSTRAINT Message_pk PRIMARY KEY (idMessage),
-	CONSTRAINT Message_fk FOREIGN KEY (idMessage) REFERENCES Administrateur (idAdm)
+	CONSTRAINT Message_fk FOREIGN KEY (admAjout) REFERENCES Administrateur (idAdm)
 );
 
 CREATE TABLE Question
@@ -80,20 +81,24 @@ CREATE TABLE Question
 	idQ VARCHAR(50),
 	titreQ VARCHAR(50),
 	contenuQ VARCHAR(50),
+	id_borne VARCHAR(50),
+	matriculeDem VARCHAR(50),
 	CONSTRAINT Question_pk PRIMARY KEY (idQ),
 	CONSTRAINT Question_fk1 FOREIGN KEY (idQ) REFERENCES Message (idMessage),
-	CONSTRAINT Question_fk2 FOREIGN KEY (idQ) REFERENCES Borne (id_borne),
-	CONSTRAINT Question_fk3 FOREIGN KEY (idQ) REFERENCES Demandeur (matricule_etu)
+	CONSTRAINT Question_fk2 FOREIGN KEY (id_borne) REFERENCES Borne (id_borne),
+	CONSTRAINT Question_fk3 FOREIGN KEY (matriculeDem) REFERENCES Demandeur (matricule_etu)
 ) INHERITS (Message);
 
 CREATE TABLE Reponse
 (
 	idR VARCHAR(50),
 	contenuRep VARCHAR(50),
+	matriculeRep VARCHAR(50),
+	idQ VARCHAR(50),
 	CONSTRAINT Reponse_pk PRIMARY KEY (idR),
 	CONSTRAINT Reponse_fk1 FOREIGN KEY (idR) REFERENCES Message (idMessage),
-	CONSTRAINT Reponse_fk2 FOREIGN KEY (idR) REFERENCES Assistant (matricule_etu),
-	CONSTRAINT Reponse_fk3 FOREIGN KEY (idR) REFERENCES Question (idQ)
+	CONSTRAINT Reponse_fk2 FOREIGN KEY (matriculeRep) REFERENCES Assistant (matricule_etu),
+	CONSTRAINT Reponse_fk3 FOREIGN KEY (idQ) REFERENCES Question (idQ)
 ) INHERITS (Message);
 
 CREATE TABLE Connexion

@@ -9,6 +9,8 @@ typedef struct users
     char tel[50];
     char universite[50];
     char specialite[50];
+    char type_dem[50];
+    char etat_dem[50];
 } User;
 
 typedef struct questions
@@ -25,5 +27,6 @@ User enter_information();
 void affiche(User etu);
 char *typesFAQ(char **types, int n);
 void questions(QR *qr);
+QR formuler_question();
 
 #endif

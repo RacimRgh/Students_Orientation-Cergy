@@ -6,14 +6,16 @@
 
 void welcome()
 {
+    char enter;
+AGAIN:
     system("clear");
-    char enter = 0;
+    fflush(stdin);
+    enter = 0;
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t**** \t Bienvenue sur la borne d'aide d'étudiants   ****");
     printf("\n\t\t**** \t Appuyez sur une touche pour commencer...    ****");
     printf("\n\t\t*********************************************************\n");
-    // fflush(stdin);
     // while (enter != '\r' && enter != '\n')
     while (enter == 0)
     {
@@ -21,8 +23,9 @@ void welcome()
         break;
     }
     connect_to_server();
-    printf("Connexion en cours ...");
-    sleep(2000);
+    printf("\n****AU REVOIR !");
+    sleep(2);
+    goto AGAIN;
     //system("clear");
 }
 
@@ -69,13 +72,13 @@ char *typesFAQ(char **types, int n)
     switch (choix)
     {
     case 1:
-    {
         return types[0];
-        break;
-    }
-
+    case 2:
+        return types[1];
+    case 3:
+        return types[2];
     default:
-        break;
+        return "Personnalisée";
     }
 }
 
@@ -92,9 +95,24 @@ void questions(QR *qr)
         if (strcmp((qr + i)->id, ""))
             printf("\n\t\t****\t%s - %s - %s - %s - %s\n", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
     int enter = 0;
-    printf("\n\t\t****\t0 - Question personnalisée.");
+    // printf("\n\t\t****\t0 - Question personnalisée.");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t*********************************************************\n");
     printf("\n******** Votre choix ?\t(1-x) : ");
     scanf("%d", &enter);
+}
+
+QR formuler_question()
+{
+    int n = 0;
+    char buff[MAX];
+    QR qr;
+    printf("\n\t\t*********************************************************");
+    printf("\n\t\t****\t\t\t\t\t\t     ****");
+    printf("\n\t\t****Ici vous pouvez formuler votre propre question, et l'envoyer au site web pour qu'elle soit traité par un étudiant assistant");
+    printf("\n\t\t*********************************************************\n");
+    printf("\n\t\t****\tTitre de votre question: ");
+    scanf("%s", qr.titre);
+    printf("\n\t\t****\tVeuillez donner plus de détails: ");
+    scanf("%s", qr.contenu);
 }

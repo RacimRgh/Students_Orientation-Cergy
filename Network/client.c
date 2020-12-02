@@ -19,7 +19,7 @@ void user_stop_handler(int sig)
     }
 }
 
-void client_func(int sockfd)
+int client_func(int sockfd)
 {
     signal(SIGINT, user_stop_handler);
     char buff[MAX];
@@ -44,6 +44,22 @@ void client_func(int sockfd)
 
     // Vider le buffer
     bzero(buff, sizeof(buff));
+    read(sockfd, buff, sizeof(buff));
+    if (strncmp(buff, "OK", 2))
+    {
+        for (;;)
+        {
+            printf("\n****Echec de la connexion. Tentative %s", buff);
+            bzero(buff, sizeof(buff));
+            read(sockfd, buff, sizeof(buff));
+            // Si on reçoit FAIL, on arrête le client
+            if (strncmp(buff, "FAIL", 4) == 0)
+            {
+                printf("\n*****\nEXITING...\n");
+                return -1;
+            }
+        }
+    }
 
     // Récupération des types de questions de la FAQ
     i = 0;
@@ -62,16 +78,33 @@ void client_func(int sockfd)
     printf("\n\t***%s", choix);
     write(sockfd, choix, MAX);
 
-    // Récupération de la foire à question de la part du serveur
-    for (;;)
+    // Attente du OK
+    bzero(buff, sizeof(buff));
+    read(sockfd, buff, sizeof(buff));
+    if (!strncmp(buff, "OK", 2))
     {
-        read(sockfd, buff, sizeof(buff));
-        if (strncmp("end", buff, 3) == 0)
-            break;
-        sscanf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
-        i++;
+        if (strncmp(choix, "Personnalisée", 13))
+        {
+            // Récupération de la foire à question de la part du serveur
+            for (;;)
+            {
+                read(sockfd, buff, sizeof(buff));
+                if (strncmp("end", buff, 3) == 0)
+                    break;
+                sscanf(buff, "%s %s %s %s %s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                i++;
+            }
+            questions(qr);
+        }
+        else
+        {
+            formuler_question();
+        }
     }
-    questions(qr);
+    else
+    {
+        printf("\n***Une erreur est survenue, veuillez patienter");
+    }
 }
 
 void connect_to_server()

@@ -25,6 +25,9 @@ INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '3');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '4');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '5');
 
+INSERT INTO Message(idMessage, admAjout) VALUES ('Q1', 'A1');
+INSERT INTO Question (idMessage, dateMess, heureMess, idQ, titreQ, contenuQ, id_borne, matriculeDem) VALUES ('Q1', '2020-12-01', '12:34', 'Q1', 'Test question', 'long description', 'B1', '2211');
+
 
 
 
