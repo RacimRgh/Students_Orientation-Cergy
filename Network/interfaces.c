@@ -9,8 +9,8 @@ void welcome()
 {
     char enter;
 AGAIN:
-    system("clear");
-    fflush(stdin);
+    // system("clear");
+    enter = getchar();
     enter = 0;
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
@@ -106,6 +106,7 @@ void questions(QR *qr)
 QR formuler_question()
 {
     QR qr;
+    char ch;
     char buff[MAX];
     int n = 0;
 
@@ -114,9 +115,14 @@ QR formuler_question()
     printf("\n\t\t****Ici vous pouvez formuler votre propre question, et l'envoyer au site web pour qu'elle soit traité par un étudiant assistant");
     printf("\n\t\t*********************************************************\n");
     printf("\n\t\t****\tTitre de votre question: ");
-    scanf("%s", qr.titre);
+    // scanf("%[^\n]", qr.titre);
+    ch = getchar();
+    fgets(qr.titre, MAX, stdin);
+
     printf("\n\t\t****\tVeuillez donner plus de détails: ");
-    scanf("%s", qr.contenu);
+    ch = getchar();
+    fgets(qr.contenu, MAX, stdin);
+    // scanf("%[^\n]", qr.contenu);
 
     // Récupération de la date et heure actuelle
     time_t t = time(NULL);

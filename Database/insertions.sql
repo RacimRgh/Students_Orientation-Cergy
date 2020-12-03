@@ -25,9 +25,9 @@ INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '3');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '4');
 INSERT INTO faq_borne (id_borne, idFAQ) VALUES ('B1', '5');
 
-INSERT INTO Question (idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ('Q1', '2020-12-01', '12:34', 'A1', 'Test question', 'long description', 'B1', 'D2211');
+INSERT INTO Question (idQ, idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ('AAA','Q1', '2020-12-01', '12:34', 'A1', 'Test question', 'long description', 'B1', 'D2211');
 
-INSERT INTO Reponse (idMessage, dateMess, heureMess, admAjout, contenuRep, idAst) VALUES ('R2', '2020-12-02', '14:18', 'A1', 'This is the way','A6531');
+INSERT INTO Reponse (idR, idMessage, dateMess, heureMess, admAjout, contenuRep, idAst) VALUES ('BBB', 'R2', '2020-12-02', '14:18', 'A1', 'This is the way','A6531');
 
 
 

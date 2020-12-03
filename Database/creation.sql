@@ -75,18 +75,22 @@ CREATE TABLE Message
 
 CREATE TABLE Question
 (
+	idQ VARCHAR(50),
 	titreQ VARCHAR(50),
 	contenuQ VARCHAR(50),
 	id_borne VARCHAR(50),
 	idDem VARCHAR(50),
+	CONSTRAINT Question_pk PRIMARY KEY (idQ),
 	CONSTRAINT Question_fk1 FOREIGN KEY (id_borne) REFERENCES Borne (id_borne),
 	CONSTRAINT Question_fk2 FOREIGN KEY (idDem) REFERENCES Demandeur (id_dem)
 ) INHERITS (Message);
 
 CREATE TABLE Reponse
 (
+	idR VARCHAR(50),
 	contenuRep VARCHAR(50),
 	idAst VARCHAR(50),
+	CONSTRAINT Reponse_pk PRIMARY KEY (idR),
 	CONSTRAINT Reponse_fk1 FOREIGN KEY (idAst) REFERENCES Assistant (id_ast)
 ) INHERITS (Message);
 

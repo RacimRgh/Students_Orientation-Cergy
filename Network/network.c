@@ -14,27 +14,33 @@
 int server_func(int sockfd, PGconn *conn)
 {
     char buff[MAX], borne[MAX], choix[MAX], adm[MAX];
-    bzero(borne, sizeof(borne));
-    bzero(buff, sizeof(buff));
     int n, req, tentative;
     User etu;
 
+    bzero(borne, sizeof(borne));
+    bzero(buff, sizeof(buff));
+    bzero(adm, sizeof(adm));
+    bzero(choix, sizeof(choix));
+
     // Récupération du code de la borne
-    read(sockfd, borne, sizeof(borne));
-    read(sockfd, adm, sizeof(adm));
+    recv(sockfd, borne, sizeof(borne), 0);
+    send(sockfd, "borne_ok", MAX, 0);
+    recv(sockfd, adm, sizeof(adm), 0);
+    send(sockfd, "adm_ok", MAX, 0);
     printf("\n****Connexion de la borne '%s' géré par l'admin '%s'\n", borne, adm);
 
     // Récupération des informations de l'utilisateur
-    read(sockfd, buff, sizeof(buff));
+    printf("\n***Attente des informations de l'utilisateur... \n");
+    recv(sockfd, buff, sizeof(buff), 0);
     sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
     tentative = 1;
-retry:
     affiche(etu);
+retry:
     etu = insert_user(conn, etu);
     if (strncmp(etu.id, "err", 3) == 0 && tentative < 4)
     {
         sprintf(buff, "(%d/3)", tentative);
-        write(sockfd, buff, MAX);
+        send(sockfd, buff, MAX, 0);
         printf("\n****Echec de la connexion. Tentative (%d/3)", tentative);
         sleep(2);
         tentative++;
@@ -43,24 +49,24 @@ retry:
     if (tentative == 4)
     {
         printf("\n****Problème de connexion, veuillez réessayer plus tard.");
-        write(sockfd, "FAIL", MAX);
+        send(sockfd, "FAIL", MAX, 0);
         return -1;
     }
-    write(sockfd, "OK", MAX);
+    send(sockfd, "OK", MAX, 0);
     // Récupération des types de requetes, pour donner un choix à l'utilisateur
     char **types;
     types = recup_typesFAQ(conn, borne, &n);
     for (int i = 0; i < n; i++)
     {
-        write(sockfd, types[i], MAX);
+        send(sockfd, types[i], MAX, 0);
         bzero(buff, sizeof(buff));
         // printf("\n**** %s", types[i]);
     }
-    write(sockfd, "end", MAX);
+    send(sockfd, "end", MAX, 0);
 
     // Lecture du choix foire aux questions
     bzero(buff, sizeof(buff));
-    read(sockfd, buff, sizeof(buff));
+    recv(sockfd, buff, sizeof(buff), 0);
     strcpy(choix, buff);
     printf("\n\t___%s", choix);
 
@@ -71,7 +77,7 @@ retry:
     if (req)
     {
         printf("\n**Mise à jour faite!");
-        write(sockfd, "OK", MAX);
+        send(sockfd, "OK", MAX, 0);
     }
     if (strncmp(buff, "Personnalisée", 13))
     {
@@ -85,28 +91,29 @@ retry:
                 if (strcmp((qr + i)->id, ""))
                 {
                     sprintf(buff, "%s;;;%s;;;%s;;;%s;;;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
-                    write(sockfd, buff, sizeof(buff));
+                    send(sockfd, buff, sizeof(buff), 0);
                     bzero(buff, sizeof(buff));
                 }
             }
-            write(sockfd, "end", sizeof("end"));
+            send(sockfd, "end", sizeof("end"), 0);
         }
     }
     else
     {
         printf("\n****Attente de la formulation de la question");
         bzero(buff, sizeof(buff));
-        read(sockfd, buff, sizeof(buff));
+        recv(sockfd, buff, sizeof(buff), 0);
+        printf("\nReceived: \n%s\n", buff);
         QR qrp;
-        sscanf(buff, "%s %s %s %s", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
-        printf("\n\n Message reçu: \n %s-%s-%s-%s\n\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        sscanf(buff, "%[^\n]\n;%[^\n]\n;%[^\n];%[^\n]", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        printf("\n\n Message reçu: \n%s\n%s\n%s\n%s\n\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
         req = add_question(conn, qrp, etu, borne, adm);
         printf("\n****** %d ***\n", req);
     }
 
     printf("\n*** Attente du choix\n");
     bzero(buff, sizeof(buff));
-    read(sockfd, buff, sizeof(buff));
+    recv(sockfd, buff, sizeof(buff), 0);
     //insert_user(conn, etu);
     // printf("\nHERE");
     // infinite loop for chat
@@ -114,8 +121,8 @@ retry:
     // {
     //     bzero(buff, MAX);
 
-    //     // read the message from client and copy it in buffer
-    //     read(sockfd, buff, sizeof(buff));
+    //     // recv the message from client and copy it in buffer
+    //     recv(sockfd, buff, sizeof(buff));
     //     // print buffer which contains the client contents
     //     printf("From client: %s");
     //     bzero(buff, MAX);
@@ -125,7 +132,7 @@ retry:
     //     //     ;
 
     //     // // and send that buffer to client
-    //     // write(sockfd, buff, sizeof(buff));
+    //     // send(sockfd, buff, sizeof(buff));
 
     //     // // if msg contains "Exit" then server exit and chat ended.
     //     // if (strncmp("exit", buff, 4) == 0)
@@ -199,7 +206,7 @@ int main()
     else
         printf("Socket successfully binded..\n");
 
-    // Now server is ready to listen and verification
+    // Now server is readyy to listen and verification
 wait_client:
     if ((listen(sockfd, 5)) != 0)
     {
