@@ -5,7 +5,7 @@
 #include <time.h>
 #include "client.h"
 
-void welcome()
+void welcome(uint16_t PORT, char *ip)
 {
     char enter;
 AGAIN:
@@ -23,7 +23,7 @@ AGAIN:
         enter = getchar();
         break;
     }
-    connect_to_server();
+    connect_to_server(PORT, ip);
     printf("\n****AU REVOIR !");
     sleep(2);
     goto AGAIN;
@@ -52,7 +52,16 @@ User enter_information()
 
 void affiche(User etu)
 {
-    printf("\n**** %s ** %s ** %s ** %s ** %s\n", etu.nom, etu.prenom, etu.matricule, etu.tel, etu.email);
+    printf("\n________________________________________________\n");
+    printf("Utilisateur ajouté:");
+    printf("\n\tID : %s", etu.id);
+    printf("\n\tMatricule : %s", etu.matricule);
+    printf("\n\tNom et prénom : %s %s", etu.nom, etu.prenom);
+    printf("\n\tTéléphone : %s", etu.tel);
+    printf("\n\tEmail : %s", etu.matricule);
+    printf("\n\tUniversité : %s", etu.universite);
+    printf("\n\tSpécialité : %s", etu.specialite);
+    printf("\n________________________________________________\n");
 }
 
 char *typesFAQ(char **types, int n)

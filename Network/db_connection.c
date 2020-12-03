@@ -169,12 +169,13 @@ int update_user(PGconn *conn, User etu)
 int add_question(PGconn *conn, QR qr, User etu, char *borne, char *adm)
 {
     sprintf(qr.id, "Q%s", etu.id);
-    printf("\nQuestion: \n*** %s-%s-%s-%s-%s-%s-%s-%s\n", qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id);
+
     const char *const paramValues[] = {qr.id, qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id};
     const int paramLengths[] = {sizeof(qr.id), sizeof(qr.id), sizeof(qr.date), sizeof(qr.heure), sizeof(adm), sizeof(qr.titre), sizeof(qr.contenu), sizeof(borne), sizeof(etu.id)};
     const int paramFormats[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     int nParams = 9;
     int resultFormat = 0;
+
     char cmd[] = "INSERT INTO Question (idQ, idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9);";
 
     // Execution de la requete préparée
@@ -183,6 +184,37 @@ int add_question(PGconn *conn, QR qr, User etu, char *borne, char *adm)
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
         printf("UPDATE command failed\n");
+        PQclear(res);
+        return 0;
+        // do_exit(conn);
+    }
+
+    PQclear(res);
+    return 1;
+}
+
+int add_connexion(PGconn *conn, char *etuId, char *borne)
+{
+    char date[50], heure[50];
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    sprintf(heure, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+    sprintf(date, "%d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+
+    const char *const paramValues[] = {etuId, borne, date, heure};
+    const int paramLengths[] = {sizeof(etuId), sizeof(borne), sizeof(date), sizeof(heure)};
+    const int paramFormats[] = {0, 0, 0, 0};
+    int nParams = 4;
+    int resultFormat = 0;
+
+    char cmd[] = "INSERT INTO Connexion (id_dem, id_borne, date_connexion, heure_connexion) VALUES ($1,$2,$3,$4);";
+    // Execution de la requete préparée
+    PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        printf("\n****Echec de l'ajout !\n");
         PQclear(res);
         return 0;
         // do_exit(conn);

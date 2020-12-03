@@ -8,6 +8,9 @@
 #include <arpa/inet.h>
 #include "client.h"
 
+// On déclare cette variable globalement pour pouvoir fermer le client à tout moment
+// grace aux signaux (En particulier SIGINT qui arrive avec CTRL+C qui peut être équivalent à la fermeture busque du programme)
+int sockfd;
 char c = 'n';
 void user_stop_handler(int sig)
 {
@@ -15,7 +18,11 @@ void user_stop_handler(int sig)
     {
         printf("\n/!\\ Etes-vous sur de vouloir arreter ? (o/n) \n");
         scanf("%c", &c);
-        exit(0);
+        if (c == 'o')
+        {
+            close(sockfd);
+            exit(0);
+        }
     }
 }
 
@@ -62,7 +69,7 @@ int client_func(int sockfd)
             // Si on reçoit FAIL, on arrête le client
             if (strncmp(buff, "FAIL", 4) == 0)
             {
-                printf("\n*****\nEXITING...\n");
+                printf("\n*****\nArret de la session...\n");
                 return -1;
             }
         }
@@ -97,7 +104,7 @@ int client_func(int sockfd)
                 recv(sockfd, buff, sizeof(buff), 0);
                 if (strncmp("end", buff, 3) == 0)
                     break;
-                sscanf(buff, "%s;%s;%s;%s;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                sscanf(buff, "%[^\n];%[^\n];%[^\n];%[^\n];%[^\n]", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
                 i++;
             }
             questions(qr);
@@ -132,35 +139,35 @@ int client_func(int sockfd)
     }
 }
 
-void connect_to_server()
+void connect_to_server(uint16_t P, char *ip)
 {
-    int sockfd, connfd;
+    int connfd;
     struct sockaddr_in servaddr, cli;
 
-    // socket create and varification
+    // Création et vérification de la socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
     {
-        printf("socket creation failed...\n");
+        perror("Création socket échouée...\n");
         exit(0);
     }
     else
-        printf("Socket successfully created..\n");
+        printf("Création socket réussie..\n");
     bzero(&servaddr, sizeof(servaddr));
 
-    // assign IP, PORT
+    // Assigner IP et PORT
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    servaddr.sin_port = htons(PORT);
+    servaddr.sin_addr.s_addr = inet_addr(ip);
+    servaddr.sin_port = htons(P);
 
     // connect the client socket to server socket
     if (connect(sockfd, (SA *)&servaddr, sizeof(servaddr)) != 0)
     {
-        printf("connection with the server failed...\n");
+        perror("Connexion au serveur échouée...\n");
         exit(0);
     }
     else
-        printf("connected to the server..\n");
+        printf("Connecté au serveur..\n");
 
     // function for chat
     client_func(sockfd);

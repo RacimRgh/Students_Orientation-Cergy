@@ -1,5 +1,6 @@
 #ifndef __USERS
 #define __USERS
+#include <stdint.h>
 typedef struct users
 {
     char id[50];
@@ -25,7 +26,7 @@ typedef struct questions
     char heure[50];
 } QR;
 
-void welcome();
+void welcome(uint16_t PORT, char *ip);
 User enter_information();
 void affiche(User etu);
 char *typesFAQ(char **types, int n);

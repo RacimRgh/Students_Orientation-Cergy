@@ -28,14 +28,15 @@ int server_func(int sockfd, PGconn *conn)
     send(sockfd, "borne_ok", MAX, 0);
     recv(sockfd, adm, sizeof(adm), 0);
     send(sockfd, "adm_ok", MAX, 0);
-    printf("\n****Connexion de la borne '%s' géré par l'admin '%s'\n", borne, adm);
+    printf("\n________________________________________________\n");
+    printf("****Connexion de la borne '%s' géré par l'admin '%s'\n", borne, adm);
 
     // Récupération des informations de l'utilisateur
     printf("\n***Attente des informations de l'utilisateur... \n");
     recv(sockfd, buff, sizeof(buff), 0);
     sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
     tentative = 1;
-    affiche(etu);
+    // Insertion de l'utilisateur dans la BD
 retry:
     etu = insert_user(conn, etu);
     if (strncmp(etu.id, "err", 3) == 0 && tentative < 4)
@@ -54,6 +55,16 @@ retry:
         return -1;
     }
     send(sockfd, "OK", MAX, 0);
+    // Affichage de l'utilisateur connecté après succès de l'ajout
+    affiche(etu);
+
+    // Enregistrement de la connexion de l'utilisateur
+    req = add_connexion(conn, etu.id, borne);
+    if (req == 1)
+        printf("\nAjout de la connexion de %s sur la borne %s fait !", etu.id, borne);
+    if (req == 0)
+        printf("\nEchec de l'ajout de la connexion de %s sur la borne %s", etu.id, borne);
+
     // Récupération des types de requetes, pour donner un choix à l'utilisateur
     char **types;
     types = recup_typesFAQ(conn, borne, &n);
@@ -61,7 +72,6 @@ retry:
     {
         send(sockfd, types[i], MAX, 0);
         bzero(buff, sizeof(buff));
-        // printf("\n**** %s", types[i]);
     }
     send(sockfd, "end", MAX, 0);
 
@@ -69,7 +79,6 @@ retry:
     bzero(buff, sizeof(buff));
     recv(sockfd, buff, sizeof(buff), 0);
     strcpy(choix, buff);
-    printf("\n\t___%s", choix);
 
     // Mettre à jour l'utilisateur avec le type de demande formulé
     strcpy(etu.type_dem, buff);
@@ -77,9 +86,14 @@ retry:
     req = update_user(conn, etu);
     if (req)
     {
-        printf("\n**Mise à jour faite!");
+        printf("\n**Mise à jour de l'utilisateur faite!");
         send(sockfd, "OK", MAX, 0);
     }
+    else
+        printf("\nEchec de la mise à jour de l'utilisateur (Erreur non fatale)");
+
+    printf("\n________________________________________________\n");
+    // Selon le type de la demande choisie par user, soit on récupère la FAQ, soit on attend la formulation de la question manuelle
     if (strncmp(buff, "Personnalisée", 13))
     {
         printf("\nRécupération de la FAQ des %s", buff);
@@ -91,7 +105,7 @@ retry:
                 // Vérifier la validité de l'information
                 if (strcmp((qr + i)->id, ""))
                 {
-                    sprintf(buff, "%s;;;%s;;;%s;;;%s;;;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                    sprintf(buff, "%s;%s;%s;%s;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
                     send(sockfd, buff, sizeof(buff), 0);
                     bzero(buff, sizeof(buff));
                 }
@@ -105,33 +119,30 @@ retry:
         QR qrp;
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
-        printf("\nReceived1: \n%s\n", buff);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%[^\n]\n;%[^\n]", qrp.titre, qrp.contenu);
 
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
-        printf("\nReceived2: \n%s\n", buff);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%s", qrp.date);
 
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
-        printf("\nReceived3: \n%s\n", buff);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%s", qrp.heure);
-
-        printf("\n\n Message reçu: \n%s\n%s\n%s\n%s\n\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        printf("\n________________________________________________\n");
+        printf("Message: \n%s\n%s\nReçu le: \n%s\n à: %s\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
         req = add_question(conn, qrp, etu, borne, adm);
-        printf("\n****** %d ***\n", req);
     }
 
-    printf("\n*** Attente du choix\n");
+    printf("\n***Fin de la session de %s\n", etu.id);
+
     bzero(buff, sizeof(buff));
     recv(sockfd, buff, sizeof(buff), 0);
 }
 
-// Driver function
+// Serveur réseau
 int main(int argc, char *argv[])
 {
     int sockfd, connfd, len;
@@ -141,6 +152,7 @@ int main(int argc, char *argv[])
     uint16_t PORT = 8080;
     socklen_t optlen = sizeof(optval);
 
+    // Vérifier si le serveur reçoit des données par le terminal
     if (argc == 1)
     {
         servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -173,16 +185,24 @@ int main(int argc, char *argv[])
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
 
-    // socket create and verification
+    // Création de la socket et vérification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
     {
-        printf("socket creation failed...\n");
+        perror("Echec de la création de la socket...\n");
         exit(0);
     }
     else
-        printf("Socket successfully created..\n");
-    /* Set the option active */
+        printf("Socket créé avec succès...\n");
+
+    /* Activer l'option SO_KEEPALIVE pour surveiller la connexion client-serveur en cas d'arrêt brusque
+    / ou temps de réponse trop long*/
+    // On a modifié les paramètres de keepalive sous Linux sur les fichiers suivant
+    /* 
+    /proc/sys/net/ipv4/tcp_keepalive_time : En secondes, combien va t'on attendre avant de lancer la routine qui vérifie la connexion, on a mis une petite valeur pour tester (20 secondes)
+    /proc/sys/net/ipv4/tcp_keepalive_intvl : En secondes, après combien de temps la routine sera relancé (en boucle)
+    /proc/sys/net/ipv4/tcp_keepalive_probes : Nombre de tentatives avant de considérer la connexion rompue (si on ne reçoit aucune réponse ACK après 5 essais)
+    */
     optval = 1;
     optlen = sizeof(optval);
     if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, optlen) < 0)
@@ -191,57 +211,69 @@ int main(int argc, char *argv[])
         close(s);
         exit(EXIT_FAILURE);
     }
-    printf("SO_KEEPALIVE set on socket");
-    printf("\n________________________________________________\n");
 
-    /* Check the status again */
+    // Vérifier que SO_KEEPALIVE est bien activé
     if (getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0)
     {
         perror("getsockopt()");
         close(s);
         exit(EXIT_FAILURE);
     }
-    // printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
+    printf("'SO_KEEPALIVE' est activé sur la socket");
+    printf("\n________________________________________________\n");
 
+    // Conversion de l'adresse IP au format IPV4
     inet_ntop(AF_INET, &servaddr.sin_addr.s_addr, IP, sizeof(IP));
-    printf("L'adresse IP est: %s\n", IP);
 
-    // Binding newly created socket to given IP and verification
+    // Lier la socket créée avec l'adresse IP et vérifier
     if ((bind(sockfd, (SA *)&servaddr, sizeof(servaddr))) != 0)
     {
-        printf("socket bind failed...\n");
+        perror("Echec de la liaison de la socket...\n");
         exit(0);
     }
     else
-        printf("Socket successfully binded..");
+        printf("Socket liée au port...");
 
-    // Now server is readyy to listen and verification
+    // Mettre le serveur en écoute
 wait_client:
     if ((listen(sockfd, 5)) != 0)
     {
-        printf("Listen failed...\n");
+        perror("Echec de l'écoute...\n");
         exit(0);
     }
     else
-        printf("\nServer listening..");
+        printf("\nServeur en écoute sur le port %d et IP %s", PORT, IP);
     len = sizeof(cli);
     printf("\n________________________________________________\n");
-    // Connect to database
+
+    // Se connecter à la base de données PostgreSQL
     PGconn *conn = connectDB();
 
-    // Accept the data packet from client and verification
+    printf("Attente de la connexion d'un client...");
+    // Accepter la connexion d'un client
     connfd = accept(sockfd, (SA *)&cli, &len);
+
+    // Afficher les détails du client
+    printf("\n________________________________________________\n");
+    struct sockaddr_in peer;
+    int peer_len;
+    peer_len = sizeof(peer);
+    if (getpeername(sockfd, (struct sockaddr *)&peer, &peer_len))
+    {
+        printf("L'adresse IP du client est: %s\n", inet_ntoa(peer.sin_addr));
+        printf("Le client est connecté sur: %d\n", (int)ntohs(peer.sin_port));
+    }
     if (connfd < 0)
     {
-        printf("server acccept failed...\n");
+        perror("Echec de l'acceptation du client...\n");
         exit(0);
     }
     else
-        printf("server acccept the client...\n");
-
-    // Function for chatting between client and server
+        printf("Client accepté par le serveur...");
+    printf("\n________________________________________________\n");
+    // Fonction de gestion d'une session client-serveur
     server_func(connfd, conn);
     goto wait_client;
-    // After chatting close the socket
+
     //close(sockfd);
 }

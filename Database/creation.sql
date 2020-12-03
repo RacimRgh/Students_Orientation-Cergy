@@ -96,11 +96,11 @@ CREATE TABLE Reponse
 
 CREATE TABLE Connexion
 (
-	matricule_etu VARCHAR(50),
+	id_dem VARCHAR(50),
 	id_borne VARCHAR(50),
 	date_connexion DATE,
 	heure_connexion time,
-	CONSTRAINT Connexion_pk PRIMARY KEY (matricule_etu, id_borne)
+	CONSTRAINT Connexion_pk PRIMARY KEY (id_dem, id_borne)
 );
 
 CREATE TABLE Maintenance
