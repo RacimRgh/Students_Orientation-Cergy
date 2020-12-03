@@ -9,7 +9,7 @@ void welcome()
 {
     char enter;
 AGAIN:
-    // system("clear");
+    system("clear");
     enter = getchar();
     enter = 0;
     printf("\n\t\t*********************************************************");
@@ -27,7 +27,6 @@ AGAIN:
     printf("\n****AU REVOIR !");
     sleep(2);
     goto AGAIN;
-    //system("clear");
 }
 
 User enter_information()
@@ -44,6 +43,10 @@ User enter_information()
     scanf("%s", etu.tel);
     printf("\nEmail: ");
     scanf("%s", etu.email);
+    printf("\nUniversité: ");
+    scanf("%s", etu.universite);
+    printf("\nSpécialité: ");
+    scanf("%s", etu.specialite);
     return etu;
 }
 
@@ -55,7 +58,9 @@ void affiche(User etu)
 char *typesFAQ(char **types, int n)
 {
     int choix = 0;
-    // system("clear");
+    printf("\nVeuillez patienter...");
+    printf("\n________________________________________________________________________________________________________________");
+    sleep(3);
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t****\tCode - Type");
@@ -63,7 +68,8 @@ char *typesFAQ(char **types, int n)
     printf("\n\t\t*********************************************************");
     for (int i = 1; i <= n; i++)
     {
-        printf("\n\t\t****\t%d - %s\n", i, types[i - 1]);
+        printf("\n\t\t****\t%d - %s", i, types[i - 1]);
+        printf("\n\t\t****\t\t\t\t\t\t     ****");
     }
     printf("\n\t\t****\t0 - Question personnalisée.");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
@@ -85,8 +91,7 @@ char *typesFAQ(char **types, int n)
 
 void questions(QR *qr)
 {
-    // system("clear");
-    // printf("\n HERE: %ld", sizeof(qr));
+    system("clear");
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t****\tCode - Type - Titre - Question - Réponse");
@@ -96,11 +101,8 @@ void questions(QR *qr)
         if (strcmp((qr + i)->id, ""))
             printf("\n\t\t****\t%s - %s - %s - %s - %s\n", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
     int enter = 0;
-    // printf("\n\t\t****\t0 - Question personnalisée.");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t*********************************************************\n");
-    printf("\n******** Votre choix ?\t(1-x) : ");
-    scanf("%d", &enter);
 }
 
 QR formuler_question()
@@ -110,9 +112,13 @@ QR formuler_question()
     char buff[MAX];
     int n = 0;
 
+    printf("\n\t***Vous avez choisi de formuler une question manuellement.");
+    printf("\nVeuillez patienter...");
+    printf("\n________________________________________________________________________________________________________________");
+    sleep(3);
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
-    printf("\n\t\t****Ici vous pouvez formuler votre propre question, et l'envoyer au site web pour qu'elle soit traité par un étudiant assistant");
+    printf("\n\t\t****Ici vous pouvez formuler votre propre question,\n et l'envoyer au site web pour qu'elle soit traité par un étudiant assistant");
     printf("\n\t\t*********************************************************\n");
     printf("\n\t\t****\tTitre de votre question: ");
     // scanf("%[^\n]", qr.titre);
@@ -129,6 +135,7 @@ QR formuler_question()
     struct tm tm = *localtime(&t);
     sprintf(qr.date, "%d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
     sprintf(qr.heure, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
-
+    printf("\n________________________________________________________________________________________________________________");
+    printf("\nFélicitations ! votre question a bien été prise en compte, un étudiant assistant prendre contract avec vous le plus rapidement possible !");
     return qr;
 }

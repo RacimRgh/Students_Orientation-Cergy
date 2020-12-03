@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include "network.h"
 #include "interfaces.h"
+#include "ip_validator.h"
 
 // Function designed for chat between client and server.
 int server_func(int sockfd, PGconn *conn)
@@ -101,11 +102,25 @@ retry:
     else
     {
         printf("\n****Attente de la formulation de la question");
+        QR qrp;
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
-        printf("\nReceived: \n%s\n", buff);
-        QR qrp;
-        sscanf(buff, "%[^\n]\n;%[^\n]\n;%[^\n];%[^\n]", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+        printf("\nReceived1: \n%s\n", buff);
+        send(sockfd, "OK", sizeof(buff), 0);
+        sscanf(buff, "%[^\n]\n;%[^\n]", qrp.titre, qrp.contenu);
+
+        bzero(buff, sizeof(buff));
+        recv(sockfd, buff, sizeof(buff), 0);
+        printf("\nReceived2: \n%s\n", buff);
+        send(sockfd, "OK", sizeof(buff), 0);
+        sscanf(buff, "%s", qrp.date);
+
+        bzero(buff, sizeof(buff));
+        recv(sockfd, buff, sizeof(buff), 0);
+        printf("\nReceived3: \n%s\n", buff);
+        send(sockfd, "OK", sizeof(buff), 0);
+        sscanf(buff, "%s", qrp.heure);
+
         printf("\n\n Message reçu: \n%s\n%s\n%s\n%s\n\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
         req = add_question(conn, qrp, etu, borne, adm);
         printf("\n****** %d ***\n", req);
@@ -114,43 +129,49 @@ retry:
     printf("\n*** Attente du choix\n");
     bzero(buff, sizeof(buff));
     recv(sockfd, buff, sizeof(buff), 0);
-    //insert_user(conn, etu);
-    // printf("\nHERE");
-    // infinite loop for chat
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     bzero(buff, MAX);
-
-    //     // recv the message from client and copy it in buffer
-    //     recv(sockfd, buff, sizeof(buff));
-    //     // print buffer which contains the client contents
-    //     printf("From client: %s");
-    //     bzero(buff, MAX);
-    //     // n = 0;
-    //     // // copy server message in the buffer
-    //     // while ((buff[n++] = getchar()) != '\n')
-    //     //     ;
-
-    //     // // and send that buffer to client
-    //     // send(sockfd, buff, sizeof(buff));
-
-    //     // // if msg contains "Exit" then server exit and chat ended.
-    //     // if (strncmp("exit", buff, 4) == 0)
-    //     // {
-    //     //     printf("Server Exit...\n");
-    //     //     break;
-    //     // }
-    // }
 }
 
 // Driver function
-int main()
+int main(int argc, char *argv[])
 {
     int sockfd, connfd, len;
+    int optval, s;
+    char IP[MAX];
     struct sockaddr_in servaddr, cli;
-    int s;
-    int optval;
+    uint16_t PORT = 8080;
     socklen_t optlen = sizeof(optval);
+
+    if (argc == 1)
+    {
+        servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    }
+    else if (argc == 2)
+    {
+        printf("\n________________________________________________\n");
+        sscanf(argv[1], "%hd", &PORT);
+        printf("Le port donné est %hd", PORT);
+        printf("\n________________________________________________\n");
+    }
+    else if (argc == 3)
+    {
+        char ip[MAX];
+        strcpy(ip, argv[2]);
+        if (!is_valid_ip(ip))
+        {
+            printf("\n/!\\ l'adresse IP donnée est non valide /!\\ (%s)\n", argv[2]);
+            exit(-1);
+        }
+        sscanf(argv[1], "%hd", &PORT);
+        printf("\n________________________________________________\n");
+        printf("Le port donné est %hd", PORT);
+        printf("\nL'adresse IP donnée est: %s", argv[2]);
+        printf("\n________________________________________________\n");
+        bzero(&servaddr, sizeof(servaddr));
+        servaddr.sin_addr.s_addr = inet_addr(argv[2]);
+    }
+
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_port = htons(PORT);
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -161,16 +182,6 @@ int main()
     }
     else
         printf("Socket successfully created..\n");
-
-    /* Check the status for the keepalive option */
-    if (getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0)
-    {
-        perror("getsockopt()");
-        close(s);
-        exit(EXIT_FAILURE);
-    }
-    printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
-
     /* Set the option active */
     optval = 1;
     optlen = sizeof(optval);
@@ -180,7 +191,8 @@ int main()
         close(s);
         exit(EXIT_FAILURE);
     }
-    printf("SO_KEEPALIVE set on socket\n");
+    printf("SO_KEEPALIVE set on socket");
+    printf("\n________________________________________________\n");
 
     /* Check the status again */
     if (getsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optval, &optlen) < 0)
@@ -189,13 +201,10 @@ int main()
         close(s);
         exit(EXIT_FAILURE);
     }
-    printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
+    // printf("SO_KEEPALIVE is %s\n", (optval ? "ON" : "OFF"));
 
-    // assign IP, PORT
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(PORT);
+    inet_ntop(AF_INET, &servaddr.sin_addr.s_addr, IP, sizeof(IP));
+    printf("L'adresse IP est: %s\n", IP);
 
     // Binding newly created socket to given IP and verification
     if ((bind(sockfd, (SA *)&servaddr, sizeof(servaddr))) != 0)
@@ -204,7 +213,7 @@ int main()
         exit(0);
     }
     else
-        printf("Socket successfully binded..\n");
+        printf("Socket successfully binded..");
 
     // Now server is readyy to listen and verification
 wait_client:
@@ -214,9 +223,9 @@ wait_client:
         exit(0);
     }
     else
-        printf("\n_____________________________\nServer listening..\n");
+        printf("\nServer listening..");
     len = sizeof(cli);
-
+    printf("\n________________________________________________\n");
     // Connect to database
     PGconn *conn = connectDB();
 

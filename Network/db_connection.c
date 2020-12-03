@@ -23,9 +23,10 @@ PGconn *connectDB()
     char *user = PQuser(conn);
     char *db_name = PQdb(conn);
     char *pswd = PQpass(conn);
-    printf("\n______________\nConnecté à la base de données !\n");
+    printf("Connecté à la base de données !\n");
     printf("User: %s\n", user);
-    printf("Database name: %s\n__________________\n", db_name);
+    printf("Database name: %s", db_name);
+    printf("\n________________________________________________\n");
     return conn;
 }
 
@@ -169,12 +170,12 @@ int add_question(PGconn *conn, QR qr, User etu, char *borne, char *adm)
 {
     sprintf(qr.id, "Q%s", etu.id);
     printf("\nQuestion: \n*** %s-%s-%s-%s-%s-%s-%s-%s\n", qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id);
-    const char *const paramValues[] = {qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id};
-    const int paramLengths[] = {sizeof(qr.id), sizeof(qr.date), sizeof(qr.heure), sizeof(adm), sizeof(qr.titre), sizeof(qr.contenu), sizeof(borne), sizeof(etu.id)};
-    const int paramFormats[] = {0, 0, 0, 0, 0, 0, 0, 0};
-    int nParams = 8;
+    const char *const paramValues[] = {qr.id, qr.id, qr.date, qr.heure, adm, qr.titre, qr.contenu, borne, etu.id};
+    const int paramLengths[] = {sizeof(qr.id), sizeof(qr.id), sizeof(qr.date), sizeof(qr.heure), sizeof(adm), sizeof(qr.titre), sizeof(qr.contenu), sizeof(borne), sizeof(etu.id)};
+    const int paramFormats[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int nParams = 9;
     int resultFormat = 0;
-    char cmd[] = "INSERT INTO Question (idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);";
+    char cmd[] = "INSERT INTO Question (idQ, idMessage, dateMess, heureMess, admAjout, titreQ, contenuQ, id_borne, idDem) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9);";
 
     // Execution de la requete préparée
     PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);

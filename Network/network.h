@@ -2,7 +2,7 @@
 #define __NET
 #include "db_connection.h"
 #define MAX 1000
-#define PORT 8080
+// #define PORT 8080
 #define SA struct sockaddr
 
 int server_func(int sockfd, PGconn *conn);

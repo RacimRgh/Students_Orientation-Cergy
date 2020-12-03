@@ -82,7 +82,6 @@ int client_func(int sockfd)
     }
     // Envoi au serveur du type demandé pour récupérer les questions réponses correspondantes
     char *choix = typesFAQ(types, 3);
-    printf("\n\t***%s", choix);
     send(sockfd, choix, MAX, 0);
 
     // Attente du OK
@@ -108,9 +107,23 @@ int client_func(int sockfd)
             QR qrp;
             qrp = formuler_question();
             bzero(buff, sizeof(buff));
-            sprintf(buff, "%s;%s;%s;%s", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
+            sprintf(buff, "%s;%s", qrp.titre, qrp.contenu);
             printf("\n_______\n%s\n", buff);
             send(sockfd, buff, sizeof(buff), 0);
+            recv(sockfd, buff, sizeof(buff), 0);
+            bzero(buff, sizeof(buff));
+
+            sprintf(buff, "%s", qrp.date);
+            printf("\n_______\n%s\n", buff);
+            send(sockfd, buff, sizeof(buff), 0);
+            recv(sockfd, buff, sizeof(buff), 0);
+            bzero(buff, sizeof(buff));
+
+            sprintf(buff, "%s", qrp.heure);
+            printf("\n_______\n%s\n", buff);
+            send(sockfd, buff, sizeof(buff), 0);
+            recv(sockfd, buff, sizeof(buff), 0);
+            bzero(buff, sizeof(buff));
         }
     }
     else
