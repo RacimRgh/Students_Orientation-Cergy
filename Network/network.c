@@ -41,7 +41,7 @@ int server_func(int sockfd, PGconn *conn)
         return 1;
     }
 
-    sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
+    sscanf(buff, "%s %s %s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel, etu.universite, etu.specialite);
     tentative = 1;
     // Insertion de l'utilisateur dans la BD
 retry:

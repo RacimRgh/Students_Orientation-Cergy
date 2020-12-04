@@ -24,7 +24,6 @@ AGAIN:
         break;
     }
     connect_to_server(PORT, ip);
-    printf("\n****AU REVOIR !");
     sleep(2);
     goto AGAIN;
 }
@@ -156,7 +155,10 @@ QR formuler_question()
     struct tm tm = *localtime(&t);
     sprintf(qr.date, "%d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
     sprintf(qr.heure, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+    printf("\n\t\t****\t\t\t\t\t\t     ****");
+    printf("\n\t\t*********************************************************");
     printf("\n________________________________________________________________________________________________________________");
-    printf("\nFélicitations ! votre question a bien été prise en compte, un étudiant assistant prendre contract avec vous le plus rapidement possible !");
+    printf("\nVotre question à bien été prise en compte, tapez 'entrée' pour recommencer ou quitter ...");
+    ch = getchar();
     return qr;
 }

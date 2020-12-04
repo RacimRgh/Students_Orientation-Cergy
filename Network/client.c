@@ -53,7 +53,7 @@ int client_func(int sockfd)
     //affiche(etu);
 
     // Envoi les informations de l'utilisateur au serveur pour envoyer à la BD
-    sprintf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
+    sprintf(buff, "%s %s %s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel, etu.universite, etu.specialite);
     // printf("\n\n\t____**___ %s", buff);
     send(sockfd, buff, sizeof(buff), 0);
 
@@ -142,19 +142,16 @@ int client_func(int sockfd)
             qrp = formuler_question();
             bzero(buff, sizeof(buff));
             sprintf(buff, "%s;%s", qrp.titre, qrp.contenu);
-            printf("\n_______\n%s\n", buff);
             send(sockfd, buff, sizeof(buff), 0);
             recv(sockfd, buff, sizeof(buff), 0);
             bzero(buff, sizeof(buff));
 
             sprintf(buff, "%s", qrp.date);
-            printf("\n_______\n%s\n", buff);
             send(sockfd, buff, sizeof(buff), 0);
             recv(sockfd, buff, sizeof(buff), 0);
             bzero(buff, sizeof(buff));
 
             sprintf(buff, "%s", qrp.heure);
-            printf("\n_______\n%s\n", buff);
             send(sockfd, buff, sizeof(buff), 0);
             recv(sockfd, buff, sizeof(buff), 0);
             bzero(buff, sizeof(buff));
@@ -198,7 +195,7 @@ void connect_to_server(uint16_t P, char *ip)
 
     // function for chat
     client_func(sockfd);
-
+    printf("\n****AU REVOIR !");
     // close the socket
     close(sockfd);
 }
