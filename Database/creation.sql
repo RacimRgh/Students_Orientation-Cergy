@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS Administrateur CASCADE;
 DROP TABLE IF EXISTS FAQ CASCADE;
 DROP TABLE IF EXISTS faq_borne CASCADE;
 
+-- La table borne représente les bornes d'aide, donc les clients réseaux
+-- L'état 
 
 CREATE TABLE Borne
 (
@@ -18,7 +20,6 @@ CREATE TABLE Borne
 	longitude FLOAT,
 	latitude FLOAT,
 	etatB VARCHAR(50),
-	nb_requetes SERIAL,
 	CONSTRAINT Borne_pk PRIMARY KEY (id_borne)
 );
 
