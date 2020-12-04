@@ -20,6 +20,7 @@ void user_stop_handler(int sig)
         scanf("%c", &c);
         if (c == 'o')
         {
+            write(sockfd, "EXIT", 4);
             close(sockfd);
             exit(0);
         }
@@ -144,6 +145,7 @@ void connect_to_server(uint16_t P, char *ip)
     int connfd;
     struct sockaddr_in servaddr, cli;
 
+    printf("Connecté au serveur via l'adresse %s et port %hd..\n", ip, P);
     // Création et vérification de la socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)
@@ -167,7 +169,7 @@ void connect_to_server(uint16_t P, char *ip)
         exit(0);
     }
     else
-        printf("Connecté au serveur..\n");
+        printf("Connecté au serveur via l'adresse %s et port %hd..\n", ip, P);
 
     // function for chat
     client_func(sockfd);

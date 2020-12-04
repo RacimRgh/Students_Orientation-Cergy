@@ -34,6 +34,13 @@ int server_func(int sockfd, PGconn *conn)
     // Récupération des informations de l'utilisateur
     printf("\n***Attente des informations de l'utilisateur... \n");
     recv(sockfd, buff, sizeof(buff), 0);
+
+    if (strncmp(buff, "EXIT", 4) == 0)
+    {
+        printf("\nClient déconnecté, redémarrage ...");
+        return 1;
+    }
+
     sscanf(buff, "%s %s %s %s %s", etu.matricule, etu.nom, etu.prenom, etu.email, etu.tel);
     tentative = 1;
     // Insertion de l'utilisateur dans la BD
@@ -80,6 +87,16 @@ retry:
     recv(sockfd, buff, sizeof(buff), 0);
     strcpy(choix, buff);
 
+    // Le C ne pouvant pas vérifier automatiquement le contenu d'une variable, on doit vérifier manuellement si un SIGINT a été envoyé
+    // au client, et qu'il a envoyé "EXIT"
+    if (strncmp(buff, "EXIT", 4) == 0)
+    {
+        printf("\n________________________________________________\n");
+        printf("Client déconnecté, redémarrage ...");
+        printf("\n________________________________________________\n");
+        return 1;
+    }
+
     // Mettre à jour l'utilisateur avec le type de demande formulé
     strcpy(etu.type_dem, buff);
     strcpy(etu.etat_dem, "En attente");
@@ -121,17 +138,32 @@ retry:
         recv(sockfd, buff, sizeof(buff), 0);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%[^\n]\n;%[^\n]", qrp.titre, qrp.contenu);
+        if (strncmp(buff, "EXIT", 4) == 0)
+        {
+            printf("\nClient déconnecté, redémarrage ...");
+            return 1;
+        }
 
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%s", qrp.date);
+        if (strncmp(buff, "EXIT", 4) == 0)
+        {
+            printf("\nClient déconnecté, redémarrage ...");
+            return 1;
+        }
 
         bzero(buff, sizeof(buff));
         recv(sockfd, buff, sizeof(buff), 0);
         send(sockfd, "OK", sizeof(buff), 0);
         sscanf(buff, "%s", qrp.heure);
         printf("\n________________________________________________\n");
+        if (strncmp(buff, "EXIT", 4) == 0)
+        {
+            printf("\nClient déconnecté, redémarrage ...");
+            return 1;
+        }
         printf("Message: \n%s\n%s\nReçu le: \n%s\n à: %s\n", qrp.titre, qrp.contenu, qrp.date, qrp.heure);
         req = add_question(conn, qrp, etu, borne, adm);
     }
@@ -140,6 +172,11 @@ retry:
 
     bzero(buff, sizeof(buff));
     recv(sockfd, buff, sizeof(buff), 0);
+    if (strncmp(buff, "EXIT", 4) == 0)
+    {
+        printf("\nClient déconnecté, redémarrage ...");
+        return 1;
+    }
 }
 
 // Serveur réseau
@@ -273,7 +310,7 @@ wait_client:
     printf("\n________________________________________________\n");
     // Fonction de gestion d'une session client-serveur
     server_func(connfd, conn);
-    goto wait_client;
 
+    goto wait_client;
     //close(sockfd);
 }

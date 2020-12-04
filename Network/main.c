@@ -6,11 +6,12 @@ void main(int argc, char *argv[])
 {
     uint16_t PORT = 8080;
     char ip[MAX];
+    bzero(ip, sizeof(ip));
+    strcpy(ip, "127.0.0.1");
     // Vérifier si le client reçoit des données par le terminal
     if (argc == 2)
     {
         sscanf(argv[1], "%hd", &PORT);
-        strcpy(ip, "127.0.0.1");
     }
     else if (argc == 3)
     {
