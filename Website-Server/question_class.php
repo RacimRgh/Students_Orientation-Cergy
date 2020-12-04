@@ -4,14 +4,12 @@ require_once('connect.php');
 class question_Class{
     
     
-    private $table_name1 = 'Question';
-    //private $titreQ = null, $contenuQ = null, $etat = null,$idQ='B1';
-    private $idQ,$titreQ,$contenuQ,$id_borne,$idDem;
+    private $idM, $dateM, $heureM,$AdmA,$idqu,$titrq, $categorie, $contenq, $idB, $idD;
 
-    function createQuestion($idQ,$titreQ,$contenuQ,$id_borne,$idDem){
+    function createQuestion($idM,$dateM,$heureM,$AdmA,$idqu,$titrq,$categorie,$contenq,$idB,$idD){
         
-        $sql = "INSERT INTO question (idQ,titreQ, contenuQ,id_borne,idDem) VALUES ('$idQ','$titreQ', '$contenuQ','$id_borne','$idDem')";
-      
+        $sql = "INSERT INTO Question (idMessage, dateMess, heureMess, admAjout, idq,titreQ, categorie, contenuQ, id_borne, idDem) VALUES ('$idM', '$dateM', '$heureM', '$AdmA','$idqu','$titrq', '$categorie', '$contenq', '$idB', '$idD')";
+        
        $res = false;
        if(pg_query($sql))
        {
@@ -27,14 +25,18 @@ class question_Class{
 
 
     function getQuestions(){             
-        $sql ="SELECT * FROM question ORDER BY idQ DESC";
+        $sql ="SELECT * FROM question ORDER BY idq DESC";
+        return pg_query($sql);
+    } 
+    function getMessages(){             
+        $sql ="SELECT Q.dateMess as Dateq, Q.categorie as cate, Q.contenuQ as messages, D.nom_etu as nom, D.prenom_etu as prenom, D.univ_etu as univ, D.specialite_etu as spe FROM Question as Q, Demandeur as D WHERE  D.id_dem = Q.idDem";
         return pg_query($sql);
     } 
 
 
-    function getQuestionById($idQ){    
+    function getQuestionById($idqu){    
   
-        $sql ="SELECT * FROM question WHERE idQ='".$this->cleanData($idQ)."'"; 
+        $sql ="SELECT * FROM question WHERE idq='".$this->cleanData($idqu)."'"; 
         return pg_query($sql);
         
     } 
@@ -66,9 +68,9 @@ class question_Class{
     }
 
     
-    function deleteborne($idQ){    
+    function deletequestion($idqu){    
   
-         $sql ="DELETE FROM question  WHERE idQ='$idQ'"; 
+         $sql ="DELETE FROM question  WHERE idq='$idqu'"; 
         if(pg_query($sql))
         {
             $res = true;
@@ -80,9 +82,9 @@ class question_Class{
         return $res;
     } 
     // fonction permettant la modification des bornes
-    function updateQuestion($idQ,$titreQ,$contenuQ,$id_borne,$idDem){      
+    function updateQuestion($idM,$dateM,$heureM,$AdmA,$idqu,$titrq,$categorie,$contenq,$idB,$idD){      
         
-        $sql = "UPDATE question SET titreQ= '$titreQ',contenuQ= '$contenuQ', id_borne= '$id_borne', idDem= '$idDem'  WHERE idQ = '$idQ' " ;
+        $sql = "UPDATE question SET idMessage ='$dateM' , dateMess = '$heureM', heureMess='', admAjout,titreQ, categorie, contenuQ, id_borne, idDem WHERE idq = '$idqu' " ;
         $res = false;
         //var_dump((pg_query($sql)));
         if(pg_query($sql))
@@ -102,9 +104,18 @@ class question_Class{
     }
 }
 /*
-$obj = new borne_Class;
+$obj = new question_Class;
 
-//$bornes = $obj->getQuestionLastId();
+$questions = $obj->getMessages();
+var_dump($questions);
+while($question = pg_fetch_object($questions)):
+    echo     $question->dateq  . '<br>';
+    echo     $question->nom . '<br>';
+    echo     $question->prenom . '<br>';
+    echo     $question->messages . '<br>';
+    echo     $question->spe . '<br>';
+    echo     $question->univ ;
+endwhile;
 
 //echo $bornes;
 

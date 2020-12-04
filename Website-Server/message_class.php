@@ -51,7 +51,7 @@ class message_Class{
         
     } 
 
-    function getCleanedId($id)
+    function getCleanedId_message($id)
     {
         // 0-recuperer la partie alphabetique de la chaine 
         $partie_alphabetique = $id[0];

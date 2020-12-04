@@ -6,11 +6,11 @@ class reponse_Class{
     
     private $table_name1 = 'Reponse';
     //private $contenuRep = null, $idAst = null, $etat = null,$idR='B1';
-    private $idR,$contenuRep,$idAst;
+    private $idM,$dateM,$heureM,$adAj,$idRe,$contenuR,$idqu,$idAs;
 
-    function createBorne($idR,$contenuRep,$idAst){
+    function createReponse($idM,$dateM,$heureM,$adAj,$idRe,$contenuR,$idqu,$idAs){
         
-        $sql = "INSERT INTO reponse (idR,contenuRep, idAst) VALUES ('$idR','$contenuRep', '$idAst','$id_borne','$idDem')";
+        $sql = "INSERT INTO Reponse (idMessage, dateMess, heureMess, admAjout,idR, contenuRep, idq, idAst) VALUES ('$idM', '$dateM', '$heureM', '$adAj','$idRe' ,'$contenuR','$idqu','$idAs')  ";
       
        $res = false;
        if(pg_query($sql))
@@ -26,32 +26,36 @@ class reponse_Class{
 
 
 
-    function getBornes(){             
+    function getReponses(){             
         $sql ="SELECT * FROM reponse ORDER BY idR DESC";
         return pg_query($sql);
     } 
 
 
-    function getBorneById($idR){    
+    function getReponseById($idRe){    
   
-        $sql ="SELECT * FROM reponse WHERE idR='".$this->cleanData($idR)."'"; 
+        $sql ="SELECT * FROM reponse WHERE idR='".$this->cleanData($idRe)."'"; 
         return pg_query($sql);
         
     } 
-    function getBorneLastId(){    
+    function getReponseSMS(){             
+        $sql ="SELECT Q.dateMess as Dateq, Q.categorie as cate, Q.contenuQ as messages, D.nom_etu as nom, D.prenom_etu as prenom, D.univ_etu as univ, D.specialite_etu as spe FROM Reponse as R, Assistant as A WHERE  A.id_ast = R.idA";
+        return pg_query($sql);
+    } 
+    function getReponseLastId(){    
   
       
         //$sql ="SELECT * FROM reponse LIMIT 1 ORDER BY idR DESC"; 
         $sql = "SELECT idR FROM reponse ORDER BY idR ASC";
-        $bornes = pg_query($sql); 
-        while($reponse = pg_fetch_object($bornes)):
+        $reponses = pg_query($sql); 
+        while($reponse = pg_fetch_object($reponses)):
             $lastid = $reponse->idR;
         endwhile;
         return $lastid;
         
     } 
 
-    function getCleanedId($idR)
+    function getReponseCleanedId($idR)
     {
         // 0-recuperer la partie alphabetique de la chaine 
         $partie_alphabetique = $idR[0];
@@ -66,9 +70,9 @@ class reponse_Class{
     }
 
     
-    function deleteborne($idR){    
+    function deletereponse($idRu){    
   
-         $sql ="DELETE FROM reponse  WHERE idR='$idR'"; 
+         $sql ="DELETE FROM reponse  WHERE idR='$idRu'"; 
         if(pg_query($sql))
         {
             $res = true;
@@ -80,9 +84,9 @@ class reponse_Class{
         return $res;
     } 
     // fonction permettant la modification des bornes
-    function updateBorne($idR,$contenuRep,$idAst){      
+   /* function updateBorne($idM,$dateM,$heureM,$adAj,$idRe,$contenuR,$idqu,$idAs){      
         
-        $sql = "UPDATE reponse SET contenuRep= '$contenuRep',idAst= '$idAst'  WHERE idR = '$idR' " ;
+        $sql = "UPDATE reponse SET idMessage= '$idM', dateMess= '$dateM', heureMess= '$heureM', admAjout= '$adAj', contenuRep= '$contenuR', idq= '$idqu', idAst = '$idAs' WHERE idR = '$idRe' " ;
         $res = false;
         //var_dump((pg_query($sql)));
         if(pg_query($sql))
@@ -95,21 +99,22 @@ class reponse_Class{
         }
         return $res;
             
-    }
+    }*/
     // fonction permettant Protection des données au format PostgreSQL  pour les insérer dans la base de données.
     function cleanData($val){
         return pg_escape_string($val);
     }
 }
-/*
-$obj = new borne_Class;
 
+$obj = new reponse_Class;
+$a = $obj->createReponse('M6', '2020-12-02', '14:18', 'A1','R2' ,'This is the way','Q3','A6531');
+/*
 //$bornes = $obj->getBorneLastId();
 
 //echo $bornes;
 
 //var_dump($bornes);
-$a = $obj->updateBorne('B9',0.777,1.888,'Fonctionnelle');
+
 echo $a;
 
 while($reponse = pg_fetch_object($bornes)):

@@ -49,10 +49,11 @@ Class etudiant_Class{
             $lastid = $Etudiant->matricule_etu;
         endwhile;
         return $lastid;
+        echo $lastid;
         
     } 
     //Fonction permettant de transformer un matricule en un varchar
-    function getCleanedId($id)
+    function getCleanedId_etudiant($id)
     {
         // 0-recuperer la partie alphabetique de la chaine 
         $partie_alphabetique = $id[0];
@@ -103,11 +104,11 @@ Class etudiant_Class{
     }
 }
 /*
-$obj = newetudiant_Class;
+$obj = new etudiant_Class;
 
-//$Etudiants = $obj->getEtudiantLastId();
+$Etudiants = $obj->getEtudiantLastId();
 
-//echo $Etudiants;
+echo $Etudiants;
 
 //var_dump($Etudiants);
 $a = $obj->updateEtudiant('B9',0.777,1.888,'Fonctionnelle');

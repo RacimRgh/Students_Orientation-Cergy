@@ -80,9 +80,9 @@ class maintenance_Class{
         return $res;
     } 
     // fonction permettant la modification des bornes
-    function updateMaintenancee($idMain,$idAdm,$id_borne,$etat){      
+    function updateMaintenancee($idMain,$idAdm,$id_borne,$date_maint,$heure_maint){      
         
-        $sql = "UPDATE maintenance SET idAdm= '$idAdm',id_borne= '$id_borne', date_maintenance= '$date_maintenance', heure_maintenance= '$heure_maintenance'  WHERE idMain = '$idMain' " ;
+        $sql = "UPDATE maintenance SET idAdm= '$idAdm',id_borne= '$id_borne', date_maintenance= '$date_maint', heure_maintenance= '$heure_maint'  WHERE idMain = '$idMain' " ;
         $res = false;
         //var_dump((pg_query($sql)));
         if(pg_query($sql))

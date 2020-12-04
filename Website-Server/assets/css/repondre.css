@@ -1,0 +1,83 @@
+body, input, textarea, select {
+		font-family: 'Source Sans Pro', sans-serif;
+		font-weight: 300;
+		color: #777777;
+		font-size: 20pt;
+		line-height: 1.75em;
+	}
+
+	body, input, textarea, select {
+		font-family: 'Source Sans Pro', sans-serif;
+		font-weight: 300;
+		color: black;
+		font-size: 15pt;
+		line-height: 1.75em;
+		background-color: #d9e4dd;
+		border: none;
+	}
+
+body
+{
+	background-image: url("images/overlay.png"), url("images/a.jpg");
+		background-repeat: repeat, no-repeat;
+		background-size: auto, 100% 100%;
+		background-attachment: fixed;
+		overflow-y: scroll;
+	
+}
+input::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+
+#corps
+{
+	border : solid white 1px;
+	background-color: #ffffff;
+	position: relative;
+	width: 35%;
+	display: flex;
+	justify-content: center;
+	padding: 50px 50px 50px 50px;
+	margin-top: 150px;
+	border-radius: 20px;
+	
+	
+}
+
+
+textarea
+{
+	width: 100%;
+}
+
+#contact
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+h2 
+{
+	text-align: center;
+	opacity: 0.8;}
+
+	input[type="button"],
+	input[type="submit"],
+	input[type="reset"],
+	button,
+	.button {or .25s ease-in-out;
+		-moz-transition: background-col
+		-webkit-transition: background-color .25s ease-in-out;
+		-ms-transition: background-color .25s ease-in-out;
+		transition: background-color .25s ease-in-out;
+		-webkit-appearance: none;
+		display: inline-block;
+		background-color: #222222;
+		color: #ffffff;
+		border: 0;
+		cursor: pointer;
+		outline: 0;
+		padding: 0.7em 1.5em 0.7em 1.5em;
+	}

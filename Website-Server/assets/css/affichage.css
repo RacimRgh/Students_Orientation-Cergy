@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
+@import url("fontawesome-all.min.css");
+
+body, input, textarea, select {
+		font-family: 'Source Sans Pro', sans-serif;
+		font-weight: 300;
+		color: black;
+		font-size: 15pt;
+		line-height: 1.75em;}
+body
+{
+	background-image: url("images/overlay.png"), url("images/a.jpg");
+		background-repeat: repeat, no-repeat;
+		background-size: auto, 100% 100%;
+		background-attachment: fixed;
+		overflow-y: scroll;
+	
+}
+
+table
+{
+    
+    background-color: #ffffff;
+}
+td, th {
+	
+	padding : 5px 5px 5px 5px;
+}
+thead,
+tfoot {
+    
+}
+
+#tableau 
+{
+	position: absolute;
+	right: 60px;
+	left: 60px;
+	top : 100px;
+
+}
+
+input[type="button"],
+	input[type="submit"],
+	input[type="reset"],
+	button,
+	.button {
+		-moz-transition: background-color .25s ease-in-out;
+		-webkit-transition: background-color .25s ease-in-out;
+		-ms-transition: background-color .25s ease-in-out;
+		transition: background-color .25s ease-in-out;
+		-webkit-appearance: none;
+		display: inline-block;
+		background-color: #222222;
+		color: #ffffff;
+		border: 0;
+		cursor: pointer;
+		outline: 0;
+		padding: 0.7em 1.5em 0.7em 1.5em;
+	}

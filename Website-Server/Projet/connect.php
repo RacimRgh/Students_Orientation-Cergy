@@ -1,9 +1,9 @@
 <?php
 
-$db_handle = pg_connect("host=localhost dbname=dbborne user=lyse password=juju");
+$db_handle = pg_connect("host=localhost port=5432 dbname=dbborne user=postgres password=jumelle");
 
 
-    /*
+      /* 
 if ($db_handle) {
 
     echo 'Connection attempt succeeded.';
@@ -24,6 +24,7 @@ echo "<h3>Connection Information</h3>";
     echo "PORT: " . pg_port($db_handle) . "<br>";
 
     echo "<h3>Checking the query status</h3>";
+ 
 
 $query = "SELECT longitude,latitude FROM Borne";
 
