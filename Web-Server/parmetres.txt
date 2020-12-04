@@ -1,0 +1,11 @@
+Parametres de connexion à postgres linux
+//connexion au user postgres
+sudo -i -u postgres 
+Password: 
+
+psql
+//se deconnecter de postgres
+\q
+//se connecter à la base de données que l'on veut
+psql -h localhost -U lyse -W -d dbborne
+password
