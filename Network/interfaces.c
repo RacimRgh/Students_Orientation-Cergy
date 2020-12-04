@@ -100,7 +100,8 @@ char *typesFAQ(char **types, int n)
 
 void questions(QR *qr)
 {
-    system("clear");
+    // system("clear");
+    printf("\n________________________________________________________________________________________________________________");
     printf("\n\t\t*********************************************************");
     printf("\n\t\t****\t\t\t\t\t\t     ****");
     printf("\n\t\t****\tCode - Type - Titre - Question - Réponse");
@@ -108,10 +109,21 @@ void questions(QR *qr)
     printf("\n\t\t*********************************************************");
     for (int i = 0; i < sizeof(qr); i++)
         if (strcmp((qr + i)->id, ""))
-            printf("\n\t\t****\t%s - %s - %s - %s - %s\n", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+        {
+            printf("\n________________________________________________________________________________________________________________");
+            printf("\n\t\t****\nN°: %s - %s ", (qr + i)->id, (qr + i)->type);
+            printf("\n\t\t****\n\n-Titre: %s", (qr + i)->titre);
+            printf("\n\t\t****\n\n-Description: %s", (qr + i)->contenu);
+            printf("\n\t\t****\n\n-Reponse: %s", (qr + i)->reponse);
+            printf("\n________________________________________________________________________________________________________________");
+        }
     int enter = 0;
     printf("\n\t\t****\t\t\t\t\t\t     ****");
-    printf("\n\t\t*********************************************************\n");
+    printf("\n\t\t*********************************************************");
+    printf("\n________________________________________________________________________________________________________________");
+    printf("\nVoici la FAQ de cette borne, tapez 'entrée' pour recommencer ou quitter ...");
+    char ch = getchar();
+    ch = getchar();
 }
 
 QR formuler_question()

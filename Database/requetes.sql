@@ -13,4 +13,7 @@
 --SELECT * from Question;
 --SELECT * from Question;
 --SELECT * from Reponse;
-SELECT * from Connexion;
+--SELECT * from Connexion;
+-- SELECT * FROM FAQ WHERE typeFAQ='Astuces' AND idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne='B1');
+
+

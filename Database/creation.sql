@@ -8,8 +8,8 @@ DROP TABLE IF EXISTS Message CASCADE;
 DROP TABLE IF EXISTS Etudiant CASCADE;
 DROP TABLE IF EXISTS Borne CASCADE;
 DROP TABLE IF EXISTS Administrateur CASCADE;
-DROP TABLE IF EXISTS FAQ;
-DROP TABLE IF EXISTS faq_borne;
+DROP TABLE IF EXISTS FAQ CASCADE;
+DROP TABLE IF EXISTS faq_borne CASCADE;
 
 
 CREATE TABLE Borne
@@ -50,7 +50,6 @@ CREATE TABLE Demandeur
 	type_dem VARCHAR(50),
 	etat_dem VARCHAR(50),
 	CONSTRAINT Demandeur_pk PRIMARY KEY (id_dem)
-	--CONSTRAINT Demandeur_fk FOREIGN KEY (matricule_etu) REFERENCES Etudiant (matricule_etu)
 ) INHERITS (Etudiant); 
 
 CREATE TABLE Assistant
@@ -60,7 +59,6 @@ CREATE TABLE Assistant
 	date_inscription DATE,
 	nb_reponses INT,
 	CONSTRAINT Assistant_pk PRIMARY KEY (id_ast)
-	--CONSTRAINT Assistant_fk FOREIGN KEY (matricule_etu) REFERENCES Etudiant (matricule_etu)
 ) INHERITS (Etudiant);
 
 CREATE TABLE Message
@@ -76,8 +74,8 @@ CREATE TABLE Message
 CREATE TABLE Question
 (
 	idQ VARCHAR(50),
-	titreQ VARCHAR(50),
-	contenuQ VARCHAR(50),
+	titreQ VARCHAR(500),
+	contenuQ VARCHAR(500),
 	id_borne VARCHAR(50),
 	idDem VARCHAR(50),
 	CONSTRAINT Question_pk PRIMARY KEY (idQ),
@@ -88,10 +86,12 @@ CREATE TABLE Question
 CREATE TABLE Reponse
 (
 	idR VARCHAR(50),
-	contenuRep VARCHAR(50),
+	contenuRep VARCHAR(500),
 	idAst VARCHAR(50),
+	idQ VARCHAR(50),
 	CONSTRAINT Reponse_pk PRIMARY KEY (idR),
-	CONSTRAINT Reponse_fk1 FOREIGN KEY (idAst) REFERENCES Assistant (id_ast)
+	CONSTRAINT Reponse_fk1 FOREIGN KEY (idAst) REFERENCES Assistant (id_ast),
+	CONSTRAINT Reponse_fk2 FOREIGN KEY (idQ) REFERENCES Question (idQ)
 ) INHERITS (Message);
 
 CREATE TABLE Connexion
@@ -109,16 +109,18 @@ CREATE TABLE Maintenance
 	id_borne VARCHAR(50),
 	date_maintenance DATE,
 	heure_maintenance time,
-	CONSTRAINT Maintenance_pk PRIMARY KEY (idAdm, id_borne)
+	CONSTRAINT Maintenance_pk PRIMARY KEY (idAdm, id_borne),
+	CONSTRAINT Maintenance_fk FOREIGN KEY(idAdm) REFERENCES Administrateur(idAdm),
+   	CONSTRAINT Maintenance_fk1 FOREIGN KEY(id_borne) REFERENCES Borne(id_borne)
 );
 
 CREATE TABLE FAQ
 (
 	idFAQ VARCHAR(50),
 	typeFAQ VARCHAR(50),
-	titreFAQ VARCHAR(50),
-	contenuFAQ VARCHAR(200),
-	reponseFAQ VARCHAR(200),
+	titreFAQ VARCHAR(500),
+	contenuFAQ VARCHAR(500),
+	reponseFAQ VARCHAR(500),
 	CONSTRAINT QuestionPR_pk PRIMARY KEY (idFAQ)
 );
 
@@ -126,7 +128,9 @@ CREATE TABLE faq_borne
 (
 	id_borne VARCHAR(50),
 	idFAQ VARCHAR(50),
-	CONSTRAINT contenu_pk PRIMARY KEY (id_borne, idFAQ)
+	CONSTRAINT contenu_pk PRIMARY KEY (id_borne, idFAQ),
+	CONSTRAINT contenu_fk FOREIGN KEY (id_borne) REFERENCES Borne(id_borne),
+   	CONSTRAINT contenu_fk1 FOREIGN KEY(idFAQ) REFERENCES FAQ(idFAQ)
 );
 
 

@@ -102,11 +102,37 @@ int client_func(int sockfd)
             // Récupération de la foire à question de la part du serveur
             for (;;)
             {
+                bzero(buff, sizeof(buff));
                 recv(sockfd, buff, sizeof(buff), 0);
+                sscanf(buff, "%s", (qr + i)->id);
+                send(sockfd, "OK", sizeof("OK"), 0);
+
+                bzero(buff, sizeof(buff));
+                recv(sockfd, buff, sizeof(buff), 0);
+                sscanf(buff, "%s", (qr + i)->type);
+                send(sockfd, "OK", sizeof("OK"), 0);
+
+                bzero(buff, sizeof(buff));
+                recv(sockfd, buff, sizeof(buff), 0);
+                sscanf(buff, "%[^\n]", (qr + i)->titre);
+                send(sockfd, "OK", sizeof("OK"), 0);
+
+                bzero(buff, sizeof(buff));
+                recv(sockfd, buff, sizeof(buff), 0);
+                sscanf(buff, "%[^\n]", (qr + i)->contenu);
+                send(sockfd, "OK", sizeof("OK"), 0);
+
+                bzero(buff, sizeof(buff));
+                recv(sockfd, buff, sizeof(buff), 0);
+                sscanf(buff, "%[^\n]", (qr + i)->reponse);
+                send(sockfd, "OK", sizeof("OK"), 0);
+
+                recv(sockfd, buff, sizeof(buff), 0);
+
+                i++;
                 if (strncmp("end", buff, 3) == 0)
                     break;
-                sscanf(buff, "%[^\n];%[^\n];%[^\n];%[^\n];%[^\n]", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
-                i++;
+                bzero(buff, sizeof(buff));
             }
             questions(qr);
         }
@@ -145,7 +171,6 @@ void connect_to_server(uint16_t P, char *ip)
     int connfd;
     struct sockaddr_in servaddr, cli;
 
-    printf("Connecté au serveur via l'adresse %s et port %hd..\n", ip, P);
     // Création et vérification de la socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1)

@@ -12,7 +12,7 @@ void do_exit(PGconn *conn)
 
 PGconn *connectDB()
 {
-    PGconn *conn = PQconnectdb("user=postgres password=4588 dbname=test");
+    PGconn *conn = PQconnectdb("user=postgres password=4588 dbname=dbborne");
 
     if (PQstatus(conn) == CONNECTION_BAD)
     {
@@ -75,7 +75,8 @@ char **recup_typesFAQ(PGconn *conn, char *borne, int *n)
     int resultFormat = 0;
 
     // Requete de récupération de la FAQ de la borne concernée
-    char cmd[] = "SELECT DISTINCT typeFAQ FROM FAQ WHERE idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$1);";
+    char cmd[] = "SELECT typeFAQ from FAQ WHERE idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$1) GROUP BY typeFAQ;";
+    //char cmd[] = "SELECT DISTINCT typeFAQ FROM FAQ WHERE idFAQ IN (SELECT idFAQ FROM faq_borne WHERE id_borne=$1);";
     // Execution de la requete préparée
     PGresult *res = PQexecParams(conn, cmd, nParams, NULL, paramValues, paramLengths, paramFormats, resultFormat);
 
@@ -98,7 +99,7 @@ char **recup_typesFAQ(PGconn *conn, char *borne, int *n)
     return types;
 }
 
-QR *recup_faq(PGconn *conn, char *borne, char *type)
+QR *recup_faq(PGconn *conn, char *borne, char *type, int *n)
 {
     // Paramètres de la fonction PGexecparams
     // Pour faire une requete préparée
@@ -123,7 +124,7 @@ QR *recup_faq(PGconn *conn, char *borne, char *type)
         // do_exit(conn);
     }
     int rows = PQntuples(res);
-    // printf("\n\nRows: %d\n\n", rows);
+    *n = rows;
     // Récupération des lignes en sortie dans un tableau de questions (defini dans interfaces.h)
     QR *qr;
     qr = malloc(rows * sizeof(QR));
@@ -134,11 +135,9 @@ QR *recup_faq(PGconn *conn, char *borne, char *type)
         strcpy(qr[i].titre, PQgetvalue(res, i, 2));
         strcpy(qr[i].contenu, PQgetvalue(res, i, 3));
         strcpy(qr[i].reponse, PQgetvalue(res, i, 4));
-        // printf("\n%s - %s - %s - %s - %s\n", qr[i].id, qr[i].type, qr[i].titre, qr[i].contenu, qr[i].reponse);
+        // printf("\n%s\n-%s\n-%s\n-%s\n-%s\n", qr[i].id, qr[i].type, qr[i].titre, qr[i].contenu, qr[i].reponse);
     }
     PQclear(res);
-    //PQfinish(conn);
-    // printf("\n\nRows: %ld\n\n", sizeof(qr));
     return qr;
 }
 

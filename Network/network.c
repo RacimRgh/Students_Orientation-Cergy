@@ -114,18 +114,48 @@ retry:
     if (strncmp(buff, "Personnalisée", 13))
     {
         printf("\nRécupération de la FAQ des %s", buff);
-        QR *qr = recup_faq(conn, borne, buff);
-        if (sizeof(qr) != 0)
+        QR *qr = recup_faq(conn, borne, buff, &n);
+        if (n != 0)
         {
-            for (int i = 0; i < sizeof(qr); i++)
+            int i = 0;
+            while (i < n)
             {
                 // Vérifier la validité de l'information
                 if (strcmp((qr + i)->id, ""))
                 {
-                    sprintf(buff, "%s;%s;%s;%s;%s", (qr + i)->id, (qr + i)->type, (qr + i)->titre, (qr + i)->contenu, (qr + i)->reponse);
+                    sprintf(buff, "%s", (qr + i)->id);
                     send(sockfd, buff, sizeof(buff), 0);
                     bzero(buff, sizeof(buff));
+                    recv(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+
+                    sprintf(buff, "%s", (qr + i)->type);
+                    send(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+                    recv(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+
+                    sprintf(buff, "%s", (qr + i)->titre);
+                    send(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+                    recv(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+
+                    sprintf(buff, "%ss", (qr + i)->contenu);
+                    send(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+                    recv(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+
+                    sprintf(buff, "%s", (qr + i)->reponse);
+                    send(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
+                    recv(sockfd, buff, sizeof(buff), 0);
+                    bzero(buff, sizeof(buff));
                 }
+                i++;
+                if (i != n)
+                    send(sockfd, "continue", sizeof("continue"), 0);
             }
             send(sockfd, "end", sizeof("end"), 0);
         }
