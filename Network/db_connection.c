@@ -130,12 +130,12 @@ QR *recup_faq(PGconn *conn, char *borne, char *type, int *n)
     qr = malloc(rows * sizeof(QR));
     for (int i = 0; i < rows; i++)
     {
-        strcpy(qr[i].id, PQgetvalue(res, i, 0));
-        strcpy(qr[i].type, PQgetvalue(res, i, 1));
-        strcpy(qr[i].titre, PQgetvalue(res, i, 2));
+        strcpy(qr[i].type, PQgetvalue(res, i, 0));
+        strcpy(qr[i].titre, PQgetvalue(res, i, 1));
+        strcpy(qr[i].id, PQgetvalue(res, i, 2));
         strcpy(qr[i].contenu, PQgetvalue(res, i, 3));
         strcpy(qr[i].reponse, PQgetvalue(res, i, 4));
-        // printf("\n%s\n-%s\n-%s\n-%s\n-%s\n", qr[i].id, qr[i].type, qr[i].titre, qr[i].contenu, qr[i].reponse);
+        printf("\n%s\n-%s\n-%s\n-%s\n-%s\n", qr[i].id, qr[i].type, qr[i].titre, qr[i].contenu, qr[i].reponse);
     }
     PQclear(res);
     return qr;

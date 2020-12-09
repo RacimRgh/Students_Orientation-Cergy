@@ -83,18 +83,3 @@ int is_valid_ip(char *ip_str)
         return 0;
     return 1;
 }
-
-// // Driver code
-// int main()
-// {
-//     char ip1[] = "128.0.0.1";
-//     char ip2[] = "125.16.100.1";
-//     char ip3[] = "125.512.100.1";
-//     char ip4[] = "125.512.100.abc";
-//     printf("\n%s\n", is_valid_ip(ip1) ? "Valid\n" : "Not valid\n");
-//     printf("\n%s\n", is_valid_ip(ip2) ? "Valid\n" : "Not valid\n");
-//     printf("\n%s\n", is_valid_ip(ip3) ? "Valid\n" : "Not valid\n");
-//     printf("\n%s\n", is_valid_ip(ip4) ? "Valid\n" : "Not valid\n");
-
-//     return 0;
-// }

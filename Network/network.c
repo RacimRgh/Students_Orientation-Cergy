@@ -218,7 +218,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in servaddr, cli;
     uint16_t PORT = 8080;
     socklen_t optlen = sizeof(optval);
-
     // Vérifier si le serveur reçoit des données par le terminal
     if (argc == 1)
     {

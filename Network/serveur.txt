@@ -1,0 +1,17 @@
+Script started on 2020-12-09 17:48:48+01:00 [TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="130" LINES="32"]
+]0;racimrighi@pop-os: ~/Documents/L3-CERGY/Projet BD-Réseau/Students_Orientation-Cergy/Network[01;32mracimrighi@pop-os[00m:[01;34m~/Documents/L3-CERGY/Projet BD-Réseau/Students_Orientation-Cergy/Network[00m$ ./network 
+Socket créé avec succès...
+'SO_KEEPALIVE' est activé sur la socket
+________________________________________________
+Socket liée au port...
+Serveur en écoute sur le port 8080 et IP 0.0.0.0
+________________________________________________
+Connecté à la base de données !
+User: postgres
+Database name: dbborne
+________________________________________________
+^C
+]0;racimrighi@pop-os: ~/Documents/L3-CERGY/Projet BD-Réseau/Students_Orientation-Cergy/Network[01;32mracimrighi@pop-os[00m:[01;34m~/Documents/L3-CERGY/Projet BD-Réseau/Students_Orientation-Cergy/Network[00m$ exit
+exit
+
+Script done on 2020-12-09 17:49:13+01:00 [COMMAND_EXIT_CODE="130"]

@@ -109,7 +109,7 @@ int client_func(int sockfd)
 
                 bzero(buff, sizeof(buff));
                 recv(sockfd, buff, sizeof(buff), 0);
-                sscanf(buff, "%s", (qr + i)->type);
+                sscanf(buff, "%[^\n]", (qr + i)->type);
                 send(sockfd, "OK", sizeof("OK"), 0);
 
                 bzero(buff, sizeof(buff));
